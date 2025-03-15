@@ -1,0 +1,35 @@
+{
+  "name": "backend",
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsup",
+    "start": "node dist/index.js"
+  },
+  "imports": {
+    "@/*": "./src/*"
+  },
+  "dependencies": {
+    "@hono/node-server": "^1.13.7",
+    "@supabase/supabase-js": "^2.39.3",
+    "dotenv": "^16.4.5",
+    "google-auth-library": "^9.4.1",
+    "googleapis": "^129.0.0",
+    "hono": "^4.6.12",
+    "imap-simple": "^5.1.0",
+    "imapflow": "^1.0.166",
+    "mailparser": "^3.7.1",
+    "nodemailer": "^6.9.7"
+  },
+  "devDependencies": {
+    "@types/imap-simple": "^4.2.9",
+    "@types/imapflow": "^1.0.19",
+    "@types/mailparser": "^3.4.5",
+    "@types/node": "^20.17.8",
+    "@types/nodemailer": "^6.4.16",
+    "nodemon": "^3.1.7",
+    "tsup": "^8.3.5",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2"
+  }
+}

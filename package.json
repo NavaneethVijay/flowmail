@@ -1,0 +1,22 @@
+{
+  "name": "flowmail",
+  "private": true,
+  "workspaces": [
+    "apps/web",
+    "apps/backend"
+  ],
+  "scripts": {
+    "dev:frontend": "cd apps/web && npm run dev",
+    "dev:backend": "cd apps/backend && npm run dev",
+    "dev": "concurrently \"npm run dev:frontend\" \"npm run dev:backend\"",
+    "build:frontend": "cd apps/web && npm run build",
+    "build:backend": "cd apps/backend && npm run build",
+    "build": "npm run build:backend && npm run build:frontend",
+    "start:frontend": "cd apps/web && npm run start",
+    "start:backend": "cd apps/backend && npm run start",
+    "start": "concurrently \"npm run start:frontend\" \"npm run start:backend\""
+  },
+  "devDependencies": {
+    "concurrently": "^7.0.0"
+  }
+}
