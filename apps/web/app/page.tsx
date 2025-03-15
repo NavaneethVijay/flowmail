@@ -13,7 +13,7 @@ import { LogIn } from "lucide-react";
 export default function Home() {
 
   const handleGoogleSignIn = () => {
-    window.location.href = 'http://localhost:3001/api/auth/login'
+    window.location.href = `${process.env.NEXT_PUBLIC_API_URL}/api/auth/login`
   };
   return (
     <main className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background to-muted p-4">
