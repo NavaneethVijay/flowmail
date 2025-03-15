@@ -8,6 +8,7 @@ export const createServerApiClient = () => {
         headers: {
             'Content-Type': 'application/json',
         },
+        withCredentials: true,
     });
 };
 const apiClient = createServerApiClient();

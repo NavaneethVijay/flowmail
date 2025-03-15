@@ -27,10 +27,10 @@ app.onError((err, c) => {
 })
 
 app.use('/*', cors({
-  origin: 'http://www.flowmail.in/',
   credentials: true,
   allowHeaders: ['Content-Type', 'Authorization'],
   allowMethods: ['POST', 'GET', 'OPTIONS', 'DELETE', 'PUT'],
+  origin: ['http://www.flowmail.in', 'https://www.flowmail.in'],
 }))
 
 const port = 3001
