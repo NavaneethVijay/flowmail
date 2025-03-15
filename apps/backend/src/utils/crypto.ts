@@ -23,7 +23,7 @@ export function decryptData(userKey: Buffer, encryptedData: { iv: string; auth_t
 }
 
 // Encrypts data using AES-256-GCM
-export function encryptData(userKey: Buffer, data: string): { ciphertext: string; iv: string; auth_tag: string } {
+export function encryptData(userKey: Buffer, data: string): { ciphertext: string; iv: string; authTag: string } {
     const iv = crypto.randomBytes(12); // AES-GCM requires a 12-byte IV
     const cipher = crypto.createCipheriv('aes-256-gcm', userKey, iv);
 

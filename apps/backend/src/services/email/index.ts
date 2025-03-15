@@ -37,8 +37,8 @@ export default class EmailService {
       response.map(async (message) => {
         const email = await this.provider.getEmailDetails(message.id);
         const headers = email.data.payload?.headers;
-        const from = headers?.find((h) => h.name === 'From')?.value;
-        const to = headers?.find((h) => h.name === 'To')?.value;
+        const from = headers?.find((h: any) => h.name === 'From')?.value;
+        const to = headers?.find((h: any) => h.name === 'To')?.value;
         return { from, to };
       }) || []
     ) as EmailData[]

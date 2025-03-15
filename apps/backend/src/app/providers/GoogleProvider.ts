@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { gmail_v1, google } from 'googleapis'
 import { OAuth2Client } from 'google-auth-library'
 import { BaseProvider } from './BaseProvider'

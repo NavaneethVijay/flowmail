@@ -104,8 +104,8 @@ export default class AuthService {
 
     const { data: authData, error: authError } = await supabase.auth.admin.createUser({
       email: userinfo.email!,
-      email_verified: true,
-      provider: 'google'
+      email_confirm: true,
+      // provider: 'google'
     });
 
     //Handle user already exists
@@ -114,7 +114,7 @@ export default class AuthService {
       const { data, error: sessionError } = await supabase.auth.signInWithIdToken({
         provider: 'google',
         token: tokens.id_token!,
-        access_token: tokens.access_token
+        access_token: tokens.access_token || ''
       });
 
       console.log('data from supabase sign in with google', data)
@@ -153,7 +153,7 @@ export default class AuthService {
     const { data, error: sessionError } = await supabase.auth.signInWithIdToken({
       provider: 'google',
       token: tokens.id_token!,
-      access_token: tokens.access_token
+      access_token: tokens.access_token || ''
     });
 
     if (sessionError) {
