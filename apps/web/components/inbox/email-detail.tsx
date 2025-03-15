@@ -53,14 +53,14 @@ export default function EmailDetail() {
         </div>
         <div className="prose max-w-none">
           <p>Hello,</p>
-          <p>Here's this week's progress report. We've made significant strides in our main project and I'm pleased with the team's performance.</p>
+          <p>Here&apos;s this week&apos;s progress report. We&apos;ve made significant strides in our main project and I&apos;m pleased with the team&apos;s performance.</p>
           <p>Key points:</p>
           <ul>
             <li>Project A is 80% complete</li>
-            <li>We've onboarded 2 new clients</li>
+            <li>We&apos;ve onboarded 2 new clients</li>
             <li>Team productivity has increased by 15%</li>
           </ul>
-          <p>Let's discuss these in our next meeting.</p>
+          <p>Let&apos;s discuss these in our next meeting.</p>
           <p>Best regards,<br />Boss Smith</p>
         </div>
       </div>
