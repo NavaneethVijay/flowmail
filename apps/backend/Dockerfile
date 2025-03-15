@@ -1,33 +1,23 @@
-# Build stage
-FROM node:20-alpine as builder
+# Use official Node.js LTS image as the base
+FROM node:18-alpine
 
 WORKDIR /app
 
-# Copy package files
-COPY package*.json ./
-RUN npm ci
+# Copy package.json and package-lock.json first (to leverage Docker cache)
+COPY package.json package-lock.json ./
+
+# Install all dependencies, including dev dependencies (needed for build)
+RUN npm install
 
 # Copy source code and build
 COPY . .
 RUN npm run build
 
-# Production stage
-FROM node:20-alpine
-
-WORKDIR /app
-
-# Copy package files and install production dependencies
-COPY package*.json ./
-RUN npm ci --only=production
-
-# Copy built files from builder stage
-COPY --from=builder /app/dist ./dist
-
-# Set environment variables
-ENV NODE_ENV=production
+# Remove dev dependencies after build to reduce image size
+RUN npm prune --omit=dev
 
 # Expose the port your app runs on
 EXPOSE 3001
 
 # Start the application
-CMD ["npm", "start"]
+CMD ["node", "dist/index.js"]
