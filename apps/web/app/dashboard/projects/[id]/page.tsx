@@ -77,6 +77,7 @@ export default function ProjectBoard() {
   } = useKanbanStore();
 
   const [selectedEmail, setSelectedEmail] = useState<Email | null>(null);
+  const [selectedKanbanEmail, setSelectedKanbanEmail] = useState<Email | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { toast } = useToast();
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
@@ -110,13 +111,16 @@ export default function ProjectBoard() {
       );
       const { board: boardInfo, board_columns } = boardData;
 
+      // Sort board_columns by position
+      const sortedBoardColumns = [...board_columns].sort((a, b) => a.position - b.position);
+
       const data = await fetch(
         `/api/projects/${boardInfo.id}/email?forceRefresh=${forceRefresh}`
       ).then((res) => res.json());
 
       const { emails } = data;
       setUniqueEmails(extractUniqueEmails(emails));
-      const columnTypeMap = board_columns.reduce(
+      const columnTypeMap = sortedBoardColumns.reduce(
         (acc: Record<number, string>, col: BoardColumn) => {
           acc[col.id] = col.type.toLowerCase();
           return acc;
@@ -124,7 +128,7 @@ export default function ProjectBoard() {
         {}
       );
 
-      const formattedColumns = board_columns.reduce(
+      const formattedColumns = sortedBoardColumns.reduce(
         (acc: Record<string, BoardColumn>, column: BoardColumn) => {
           acc[column.type.toLowerCase()] = {
             ...column,
@@ -171,12 +175,11 @@ export default function ProjectBoard() {
     setSyncing(false);
   };
 
-  const fetchEmailThread = async (threadId: string) => {
+  const fetchEmailThread = async (email: Email) => {
     try {
-      const emailData = await fetch(`/api/emails/${threadId}`).then((res) =>
+      const emailData = await fetch(`/api/emails/${email.thread_id}`).then((res) =>
         res.json()
       );
-      console.log("emailData", emailData);
       setSelectedEmail(emailData);
     } catch (error) {
       console.error("Failed to fetch email thread:", error);
@@ -184,8 +187,10 @@ export default function ProjectBoard() {
   };
 
   const handleItemClick = async (email: Email) => {
+    console.log('email from kaban', email);
     setIsModalOpen(true);
-    await fetchEmailThread(email.thread_id);
+    setSelectedKanbanEmail(email);
+    await fetchEmailThread(email);
   };
 
   const throttledUpdateColumns = useCallback(
@@ -236,6 +241,9 @@ export default function ProjectBoard() {
         type: column.type,
         settings: column.settings,
       }));
+      console.log(
+        'columnsArray', columnsArray
+      );
 
       throttledUpdateColumns(columnsArray as BoardColumn[]);
     },
@@ -303,13 +311,15 @@ export default function ProjectBoard() {
         </ScrollArea>
       </div>
 
+
+
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
         <DialogContent className="max-w-[80vw] w-[80vw] h-[90vh] px-0 pt-4 bg-neutral-100">
           <DialogHeader className="hidden">
             <DialogTitle>Email Details</DialogTitle>
             <DialogDescription>View email details here.</DialogDescription>
           </DialogHeader>
-          <EmailsDetails selectedEmail={selectedEmail} />
+          <EmailsDetails selectedEmail={selectedEmail} kanbanEmail={selectedKanbanEmail} />
         </DialogContent>
       </Dialog>
 

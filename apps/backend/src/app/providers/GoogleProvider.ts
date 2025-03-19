@@ -112,75 +112,71 @@ export class GoogleProvider extends BaseProvider {
         if (!this.tokens) throw new Error('Client not connected');
         await this.setClientConnection()
 
-        // Can skip this because we send threadId from FE
-        // Step 1: Retrieve the initial message to get threadId
+        // Get the message details
         const email = await this.gmail.users.messages.get({
             userId: 'me',
             id: options.id,
             format: options.format,
             auth: this.oauth2Client
         });
-        const threadId = email.data.threadId;
 
-        // Step 2: Retrieve the full thread by threadId
-        const thread = await this.gmail.users.threads.get({
-            userId: 'me',
-            id: threadId,
-            auth: this.oauth2Client
-        });
+        const headers = email.data.payload?.headers || [];
+        const labels = email.data.labelIds || [];
 
-        // Step 3: Extract and store content of each message in the thread
-        const messagesData = thread.data.messages.map(message => {
-            const subject = message.payload.headers.find(header => header.name === 'Subject')?.value || '';
-            const from = message.payload.headers.find(header => header.name === 'From')?.value || '';
-            const date = message.payload.headers.find(header => header.name === 'Date')?.value || '';
-            const body = this.decodeMessageContent(message.payload);
+        // Extract email body
+        let body = '';
 
-            return {
-                from,
-                date,
-                subject,
-                body: body
-            };
-        });
+        if (email.data.payload?.body?.data) {
+            // If body is directly available
+            body = Buffer.from(email.data.payload.body.data, 'base64').toString('utf-8');
+        } else if (email.data.payload?.parts) {
+            // If the body is in multiple parts (multipart email)
+            body = this.decodeMessageContent(email.data.payload);
+        }
 
-        return messagesData
+        const emailData: EmailData = {
+            id: email.data.id!,
+            threadId: email.data.threadId!,
+            subject: headers.find((h) => h.name === 'Subject')?.value,
+            from: headers.find((h) => h.name === 'From')?.value,
+            to: headers.find((h) => h.name === 'To')?.value,
+            cc: headers.find((h) => h.name === 'Cc')?.value,
+            date: headers.find((h) => h.name === 'Date')?.value,
+            snippet: email.data.snippet,
+            body,
+            labels: {
+                starred: labels.includes('STARRED'),
+                important: labels.includes('IMPORTANT'),
+                inbox: labels.includes('INBOX'),
+                sent: labels.includes('SENT'),
+                draft: labels.includes('DRAFT'),
+                spam: labels.includes('SPAM'),
+                trash: labels.includes('TRASH'),
+                unread: labels.includes('UNREAD'),
+                custom: labels.filter(
+                    (label) =>
+                        ![
+                            'STARRED',
+                            'IMPORTANT',
+                            'INBOX',
+                            'SENT',
+                            'DRAFT',
+                            'SPAM',
+                            'TRASH',
+                            'UNREAD',
+                            'CATEGORY_PERSONAL',
+                            'CATEGORY_SOCIAL',
+                            'CATEGORY_PROMOTIONS',
+                            'CATEGORY_UPDATES',
+                            'CATEGORY_FORUMS',
+                        ].includes(label)
+                ),
+            },
+            rawLabels: labels,
+        };
+
+        return [emailData];
     }
-
-    // decodeMessageContent(payload) {
-    //     const parts = payload.parts || [];
-    //     let htmlContent = '';
-    //     let plainTextContent = '';
-
-    //     parts.forEach(part => {
-    //         console.log("Part MIME Type:", part.mimeType); // Log mimeType to check structure
-    //         if (part.mimeType === 'text/html') {
-    //             try {
-    //                 htmlContent += Buffer.from(part.body.data, 'base64').toString('utf-8');
-    //             } catch (error) {
-    //                 console.error("Error decoding HTML:", error);
-    //             }
-    //         } else if (part.mimeType === 'text/plain') {
-    //             try {
-    //                 plainTextContent += Buffer.from(part.body.data, 'base64').toString('utf-8');
-    //             } catch (error) {
-    //                 console.error("Error decoding text:", error);
-    //             }
-    //         } else if (part.parts && part.parts.length > 0) {
-    //             // Recursively handle nested parts
-    //             const nestedContent = this.decodeMessageContent(part);
-    //             htmlContent += nestedContent.html;
-    //             plainTextContent += nestedContent.text;
-    //         }
-    //     });
-
-    //     // Return the content, prioritizing HTML over plain text
-    //     return {
-    //         html: htmlContent || null,
-    //         text: plainTextContent || null
-    //     };
-    // }
-
 
     private decodeMessageContent(payload: any): string {
         const parts = payload.parts || [];
@@ -200,7 +196,6 @@ export class GoogleProvider extends BaseProvider {
 
         return '';
     }
-
 
     async setClientConnection(): Promise<void> {
         this.oauth2Client.setCredentials(this.tokens)
@@ -357,6 +352,5 @@ export class GoogleProvider extends BaseProvider {
             return { emails: [], nextPageToken: null };
         }
     }
-
 
 }

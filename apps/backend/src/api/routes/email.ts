@@ -57,6 +57,8 @@ emailRouter.get('/recent-inbox-emails', async (c: RequestContext) => {
  * Get email thread
  */
 emailRouter.get('/:id', async (c: RequestContext) => {
+  console.log('called to fetch email detauils')
+
   const emailId = c.req.param('id')
   try {
     const user = c.get('user') as User
@@ -67,4 +69,5 @@ emailRouter.get('/:id', async (c: RequestContext) => {
     return c.json({ error: 'Failed to fetch email' }, 500)
   }
 })
+
 export { emailRouter }

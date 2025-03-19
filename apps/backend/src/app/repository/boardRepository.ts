@@ -64,29 +64,47 @@ export class BoardRepository {
   }
 
   async getBoardsByUserId(userId: string): Promise<Board[]> {
+    // First get all boards for the user
     const { data, error } = await supabase
       .from(this.BOARDS_TABLE)
-      .select(`*,
-            ${this.BOARD_CACHE_KEY} (
-              last_synced_at,
-              cache_tag
-            )
-          `)
+      .select(`
+        *,
+        ${this.BOARD_CACHE_KEY} (
+          last_synced_at,
+          cache_tag
+        )
+      `)
       .eq('user_id', userId)
 
     if (error) {
       console.error('Error getting boards by user id:', error)
       throw error
     }
-    const formattedData = data.map((board) => {
-      const { board_email_cache, ...rest } = board;
-      return {
-        ...rest,
-        last_synced_at: board[this.BOARD_CACHE_KEY]?.last_synced_at || null,
-      };
-    });
 
-    return formattedData
+    // Then get the email counts for each board
+    const boardsWithCounts = await Promise.all(data.map(async (board) => {
+      const { count, error: countError } = await supabase
+        .from('board_emails')
+        .select('*', { count: 'exact' })
+        .eq('board_id', board.id)
+
+      if (countError) {
+        console.error('Error getting email count for board:', countError)
+        return {
+          ...board,
+          last_synced_at: board[this.BOARD_CACHE_KEY]?.last_synced_at || null,
+          email_count: 0
+        }
+      }
+
+      return {
+        ...board,
+        last_synced_at: board[this.BOARD_CACHE_KEY]?.last_synced_at || null,
+        email_count: count || 0
+      }
+    }))
+
+    return boardsWithCounts
   }
 
   async getBoardBySlug(slug: string, userId: string): Promise<Board> {

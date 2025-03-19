@@ -13,6 +13,8 @@ import { ChevronLeft, ChevronRight, Plus } from "lucide-react";
 import { ScrollArea } from "@radix-ui/react-scroll-area";
 import { formatEmailDate } from "@/lib/utils";
 import { AddToProjectDialog } from "@/components/inbox/add-to-project-dialog";
+import { cn } from "@/lib/utils";
+import { useToast } from "@/hooks/use-toast";
 
 interface Email {
   id: string;
@@ -37,13 +39,19 @@ function parseEmailString(emailStr: string) {
   };
 }
 
-export default function EmailList() {
+interface EmailListProps {
+  onEmailSelect: (threadId: string) => void;
+}
+
+export default function EmailList({ onEmailSelect }: EmailListProps) {
   const [emails, setEmails] = useState<Email[]>([]);
   const [selectedEmails, setSelectedEmails] = useState<string[]>([]);
   const [nextPageToken, setNextPageToken] = useState<string | null>(null);
   const [prevTokens, setPrevTokens] = useState<string[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [isAddToProjectOpen, setIsAddToProjectOpen] = useState(false);
+  const [selectedThreadId, setSelectedThreadId] = useState<string | null>(null);
+  const { toast } = useToast();
 
   // Fetch emails from the API
   const fetchEmails = async (pageToken: string | null = null) => {
@@ -98,9 +106,53 @@ export default function EmailList() {
     );
   };
 
-  const handleAddToProject = (projectId: number) => {
-    console.log("Selected emails:", selectedEmails);
-    console.log("Selected project:", projectId);
+  const handleAddToProject = async (projectId: number) => {
+    try {
+      // Find the selected emails' data
+      const selectedEmailsData = emails.filter(email => selectedEmails.includes(email.id));
+
+      // Make API calls for each selected email
+      const promises = selectedEmailsData.map(email =>
+        fetch(`/api/projects/${projectId}/emails`, {
+          method: "POST",
+          body: JSON.stringify({
+            email_id: email.id,
+            thread_id: email.threadId,
+          }),
+        })
+      );
+
+      // Wait for all API calls to complete
+      const results = await Promise.all(promises);
+
+      // Check if any request failed
+      const failed = results.some(res => !res.ok);
+
+      if (failed) {
+        throw new Error("Failed to add some emails to project");
+      }
+
+      toast({
+        title: "Success",
+        description: `${selectedEmails.length} email${selectedEmails.length > 1 ? 's' : ''} added to project successfully!`,
+      });
+
+      // Clear selection after successful addition
+      setSelectedEmails([]);
+      setIsAddToProjectOpen(false);
+    } catch (error) {
+      console.error("Error adding emails to project:", error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to add emails to project. Please try again.",
+      });
+    }
+  };
+
+  const handleEmailClick = (email: Email) => {
+    setSelectedThreadId(email.threadId);
+    onEmailSelect(email.threadId);
   };
 
   return (
@@ -158,7 +210,7 @@ export default function EmailList() {
         </div>
       </div>
       <div className="flex-grow overflow-auto">
-        <ScrollArea className="h-[calc(100vh-10rem)] rounded-md border">
+        <ScrollArea className="h-[calc(100vh-10rem)] rounded-md">
           {loading ? (
             <p className="text-center p-4">Loading emails...</p>
           ) : emails.length === 0 ? (
@@ -172,7 +224,11 @@ export default function EmailList() {
               return (
                 <div
                   key={email.id}
-                  className="flex items-center p-2 border-b hover:bg-gray-50 cursor-pointer"
+                  className={cn(
+                    "flex items-center p-2 border-b hover:bg-gray-50 cursor-pointer",
+                    selectedThreadId === email.threadId ? "bg-gray-100" : ""
+                  )}
+                  onClick={() => handleEmailClick(email)}
                 >
                   <Checkbox
                     checked={selectedEmails.includes(email.id)}
@@ -229,3 +285,5 @@ export default function EmailList() {
     </div>
   );
 }
+
+export type { Email };

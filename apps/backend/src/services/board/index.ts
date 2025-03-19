@@ -5,7 +5,8 @@ import { BoardEmailRepository } from '@/app/repository/boardEmailRepository';
 import { BoardRepository } from '@/app/repository/boardRepository';
 import { OAuthRepository } from '@/app/repository/oauthRepository';
 import type { Board, BoardColumn } from '@/types/boards'
-import { SupabaseClient, User } from '@supabase/supabase-js';
+import { deriveUserKey } from '@/utils/crypto';
+import {  User } from '@supabase/supabase-js';
 
 
 export default class BoardService {
@@ -80,6 +81,8 @@ export default class BoardService {
     async getEmailsByBoardId(boardId: number, forceRefresh = false) {
         if (!this.user) throw new Error('User not set')
 
+        const encryptionHandler = () => deriveUserKey({ email: this.user!.email! });
+
         try {
             console.log('fetching board id', boardId)
             const board = await this.boardRepository.getBoardById(boardId, this.user.id)
@@ -87,7 +90,7 @@ export default class BoardService {
 
             if (!forceRefresh) {
                 console.log('Requesting cached emails')
-                const cachedEmails = await this.boardEmailRepository.getBoardEmails(boardId)
+                const cachedEmails = await this.boardEmailRepository.getBoardEmails(boardId, encryptionHandler)
                 if (cachedEmails && cachedEmails.length > 0) {
                     console.log('Requesting cached emails')
                     return {
@@ -117,8 +120,8 @@ export default class BoardService {
             // Handle sync when columns are updated, for new emails assgin default column
             const defaultColumn = await this.boardColumnRepository.getInitialBoardColumn(boardId)
             console.log('defaultColumn while syncing', JSON.stringify(defaultColumn, null, 2))
-            await this.boardEmailRepository.saveBoardEmails(boardId, emails as [], defaultColumn)
-            const cachedEmails = await this.boardEmailRepository.getBoardEmails(boardId)
+            await this.boardEmailRepository.saveBoardEmails(boardId, emails as [], defaultColumn , encryptionHandler)
+            const cachedEmails = await this.boardEmailRepository.getBoardEmails(boardId, encryptionHandler)
             return { emails: cachedEmails, uniqueEmails: [] }
 
         } catch (error) {
@@ -126,6 +129,29 @@ export default class BoardService {
             throw error
         }
     }
+
+    async getDefaultColumn(boardId: number) {
+        if (!this.user) throw new Error('User not set')
+        return await this.boardColumnRepository.getInitialBoardColumn(boardId)
+    }
+
+    async addEmailToBoard(boardId: number, email: any, defaultColumn: BoardColumn) {
+        if (!this.user) throw new Error('User not set')
+        const encryptionHandler = () => deriveUserKey({ email: this.user!.email! });
+
+        // Verify board exists and belongs to user
+        const board = await this.boardRepository.getBoardById(boardId, this.user.id)
+        if (!board) throw new Error('Board not found')
+
+        // Add email to board with encryption
+        await this.boardEmailRepository.saveBoardEmails(boardId, [email], defaultColumn, encryptionHandler)
+    }
+
+    async getTokens() {
+        if (!this.user) throw new Error('User not set')
+        return await this.oauthRepository.getTokens(this.user)
+    }
+
     async updateBoardColumns(boardId: number, columns: BoardColumn[]) {
         if (!this.user) throw new Error('User not set')
         return await this.boardColumnRepository.updateBoardColumns(boardId, columns, this.user.id)

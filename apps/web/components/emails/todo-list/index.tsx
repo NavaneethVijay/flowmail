@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { TaskList } from "./task-list";
 import { TaskForm } from './task-form'
 import { Button } from "@/components/ui/button";
@@ -11,85 +11,141 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { useToast } from "@/hooks/use-toast";
 
 export interface Todo {
-  id: string;
+  id?: string;
+  board_email_id: string;
   title: string;
-  description: string;
-  dueDate: Date;
+  details: string;
+  due_date: string;
   priority: string;
   completed: boolean;
+  created_at?: string;
+  updated_at?: string;
 }
 
-export default function TodoList() {
-  const [todos, setTodos] = useState<Todo[]>([
-    {
-      id: "1",
-      title: "Complete Project Proposal",
-      description: "Draft and submit the Q2 project proposal",
-      dueDate: new Date("2024-04-15"),
-      priority: "high",
-      completed: false,
-    },
-    {
-      id: "2",
-      title: "Review Code PRs",
-      description: "Review pending pull requests from the team",
-      dueDate: new Date("2024-04-10"),
-      priority: "medium",
-      completed: true,
-    },
-    {
-      id: "3",
-      title: "Update Documentation",
-      description: "Update API documentation with new endpoints",
-      dueDate: new Date("2024-04-20"),
-      priority: "low",
-      completed: false,
-    },
-    {
-        id: "4",
-        title: "Update Documentation",
-        description: "Update API documentation with new endpoints",
-        dueDate: new Date("2024-04-20"),
-        priority: "low",
-        completed: false,
-      },
-      {
-        id: "5",
-        title: "Update Documentation",
-        description: "Update API documentation with new endpoints",
-        dueDate: new Date("2024-04-20"),
-        priority: "low",
-        completed: false,
-      },
-  ]);
+interface TodoListProps {
+  boardEmailId: string;
+}
+
+export default function TodoList({ boardEmailId }: TodoListProps) {
+  const [todos, setTodos] = useState<Todo[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const { toast } = useToast();
   const [selectedTodo, setSelectedTodo] = useState<Todo | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
-  const addTodo = (todo: Todo) => {
-    setTodos([...todos, todo]);
-    setIsDialogOpen(false);
+  // Fetch todos when component mounts
+  useEffect(() => {
+    fetchTodos();
+  }, [boardEmailId]);
+
+  const fetchTodos = async () => {
+    try {
+        setIsLoading(true);
+        const response = await fetch(`/api/todos/email/${boardEmailId}`);
+        if (!response.ok) {
+            throw new Error('Failed to fetch todos');
+        }
+        const data = await response.json();
+        setTodos(data);
+    } catch (error) {
+        toast({
+            title: "Error",
+            description: "Failed to load todos",
+            variant: "destructive",
+        });
+    } finally {
+        setIsLoading(false);
+    }
+};
+
+  console.log('boardEmailId', boardEmailId);
+
+  const addTodo = async (todoData: Omit<Todo, 'id' | 'board_email_id'>) => {
+    try {
+      const response = await fetch('/api/todos', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          ...todoData,
+          board_email_id: boardEmailId,
+        }),
+      });
+      const newTodo = await response.json();
+      setTodos([...todos, newTodo]);
+      setIsDialogOpen(false);
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to create todo",
+        variant: "destructive",
+      });
+    }
   };
 
-  const deleteTodo = (id: string) => {
-    console.log("deleting todo", id);
-    setTodos(todos.filter((todo) => todo.id !== id));
+  const deleteTodo = async (id: string) => {
+    try {
+      const response = await fetch(`/api/todos/${id}`, {
+        method: 'DELETE',
+      });
+      if (!response.ok) throw new Error('Failed to delete todo');
+      setTodos(todos.filter((todo) => todo.id !== id));
+      setSelectedTodo(null);
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to delete todo",
+        variant: "destructive",
+      });
+    }
   };
 
-  const updateTodo = (updatedTodo: Todo) => {
-    setTodos(
-      todos.map((todo) => (todo.id === updatedTodo.id ? updatedTodo : todo))
-    );
-    setSelectedTodo(null);
+  const updateTodo = async (updatedTodo: Todo) => {
+    try {
+      const response = await fetch(`/api/todos/${updatedTodo.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(updatedTodo),
+      });
+      if (!response.ok) throw new Error('Failed to update todo');
+      setSelectedTodo(null);
+    } catch (error) {
+      console.error('error', error);
+      toast({
+        title: "Error",
+        description: "Failed to update todo",
+        variant: "destructive",
+      });
+    }
   };
 
-  const toggleTodo = (id: string) => {
-    setTodos(
-      todos.map((todo) =>
-        todo.id === id ? { ...todo, completed: !todo.completed } : todo
-      )
-    );
+  const toggleTodo = async (id: string) => {
+    try {
+      const response = await fetch(`/api/todos/${id}/toggle`, {
+        method: 'POST',
+      });
+      if (!response.ok) throw new Error('Failed to toggle todo');
+      const updatedTodo = await response.json();
+      setTodos(
+        todos.map((todo) => (todo.id === id ? updatedTodo : todo))
+      );
+      toast({
+        title: "Success",
+        description: "Updated your task!",
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to toggle todo completion",
+        variant: "destructive",
+      });
+    }
   };
 
   return (

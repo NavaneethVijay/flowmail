@@ -8,14 +8,14 @@ type EncryptedColumn = typeof ENCRYPTED_COLUMNS[number];
 interface EncryptedField {
     ciphertext: string;
     iv: string;
-    auth_tag: string;
+    authTag: string;
 }
 
 export class BoardEmailRepository {
     private readonly BOARD_EMAILS_TABLE = 'board_emails'
     private readonly BOARD_EMAILS_CACHE_KEY = 'board_email_cache'
 
-    async getBoardEmails(boardId: number): Promise<BoardEmail[]> {
+    async getBoardEmails(boardId: number, encryptionHandler: () => Buffer): Promise<BoardEmail[]> {
         // Fetch base email data
         const { data: boardEmails, error: emailError } = await supabase
             .from(this.BOARD_EMAILS_TABLE)
@@ -36,7 +36,7 @@ export class BoardEmailRepository {
 
         if (metadataError) throw metadataError;
 
-        const userKey = deriveUserKey({ email: "sainavaneeth@gmail.com" });
+        const userKey = encryptionHandler();
         const metadataByEmailId = this.groupMetadataByEmailId(metadata);
 
         const dataToReturn = boardEmails.map(email => {
@@ -48,10 +48,11 @@ export class BoardEmailRepository {
         return dataToReturn;
     }
 
-    async saveBoardEmails(boardId: number, emails: [], defaultColumn: BoardColumn) {
-        const userKey = deriveUserKey({ email: "sainavaneeth@gmail.com" });
+    async saveBoardEmails(boardId: number, emails: any[], defaultColumn: BoardColumn, encryptionHandler: () =>  Buffer) {
+        const userKey = encryptionHandler();
 
         await Promise.all(emails.map(async (email: any) => {
+            console.log('email to save in board', email)
             const { id: email_id, threadId: thread_id, date } = email;
 
             // Encrypt all sensitive fields
@@ -80,7 +81,6 @@ export class BoardEmailRepository {
             if (emailError) throw emailError;
 
             // Insert encryption metadata
-            // Handling how to update this
             await this.saveEncryptionMetadata(emailData[0].id, encryptedFields);
         }));
 
@@ -151,7 +151,7 @@ export class BoardEmailRepository {
             column_name: columnName as EncryptedColumn,
             ciphertext: data.ciphertext,
             iv: data.iv,
-            auth_tag: data.authTag
+            auth_tag: data.auth_tag
         }));
 
         const { error } = await supabase
@@ -184,4 +184,12 @@ export class BoardEmailRepository {
         return data
     }
 
+    async checkIfEmailIdIsValid(boardId: number, emailId: string) {
+        const { data, error } = await supabase.from(this.BOARD_EMAILS_TABLE).select('*').eq('board_id', boardId).eq('email_id', emailId)
+        if (error) {
+            console.error('Error checking if email id is valid in the board:', error);
+            throw error;
+        }
+        return data
+    }
 }

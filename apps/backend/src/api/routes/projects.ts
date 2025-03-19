@@ -5,6 +5,8 @@ import BoardService from '@/services/board/index'
 import type { Board } from '@/types/boards'
 import EmailService from '@/services/email/index'
 import { RequestContext } from '@/interfaces/IContext'
+import { GoogleProvider } from '@/app/providers/GoogleProvider'
+import { ProviderFactory } from '@/app/providers/ProviderFactory'
 
 const projectRouter = new Hono()
 const boardsService = new BoardService()
@@ -112,6 +114,47 @@ projectRouter.get('/:id/emails', async (c: RequestContext) => {
   const emails = await boardsService.setUser(user).getEmailsByBoardId(boardId, forceRefresh)
   return c.json(emails)
 })
+
+/**
+ * Add email to board
+ */
+projectRouter.post('/:id/emails', async (c: RequestContext) => {
+  try {
+    const boardId = parseInt(c.req.param('id'))
+    const user = c.get('user') as User
+    const { email_id, thread_id } = await c.req.json()
+
+    if (!email_id || !thread_id) {
+      return c.json({ error: 'email_id and thread_id are required' }, 400)
+    }
+
+    // Get the default column for the board
+    const defaultColumn = await boardsService.setUser(user).getDefaultColumn(boardId)
+    if (!defaultColumn) {
+      return c.json({ error: 'No default column found for the board' }, 404)
+    }
+
+    // Get email details directly from Google Provider
+    const tokens = await boardsService.setUser(user).getTokens()
+    const provider = ProviderFactory.createProvider('google') as GoogleProvider
+    provider.setTokens(tokens)
+    const emailDetails = await provider.getEmail({ id: email_id, format: 'full' })
+    console.log('emailDetails', emailDetails)
+
+    if (!emailDetails || emailDetails.length === 0) {
+      return c.json({ error: 'Email not found' }, 404)
+    }
+
+    // Add email to board
+    await boardsService.setUser(user).addEmailToBoard(boardId, emailDetails[0], defaultColumn)
+
+    return c.json({ message: 'Email added to board successfully' })
+  } catch (error) {
+    console.error('Error adding email to board:', error)
+    return c.json({ error: 'Failed to add email to board' }, 500)
+  }
+})
+
 /**
  * Get board by slug
  */

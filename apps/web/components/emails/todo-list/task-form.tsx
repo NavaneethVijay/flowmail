@@ -23,8 +23,8 @@ interface TaskFormProps {
 export function TaskForm({ onSubmit, onCancel, onDelete, initialValues }: TaskFormProps) {
   const [todo, setTodo] = useState<Partial<Todo>>({
     title: "",
-    description: "",
-    dueDate: new Date(),
+    details: "",
+    due_date: new Date().toISOString().split('T')[0],
     priority: "medium",
     completed: false
   })
@@ -36,15 +36,15 @@ export function TaskForm({ onSubmit, onCancel, onDelete, initialValues }: TaskFo
   }, [initialValues])
 
   const handleSubmit = () => {
-    if (!todo.title || !todo.dueDate) {
+    if (!todo.title || !todo.due_date) {
       return
     }
 
     const newTodo: Todo = {
-      id: initialValues?.id || Math.random().toString(36).substr(2, 9),
+      board_email_id: initialValues?.board_email_id || "",
       title: todo.title,
-      description: todo.description || "",
-      dueDate: todo.dueDate,
+      details: todo.details || "",
+      due_date: todo.due_date,
       priority: todo.priority || "medium",
       completed: todo.completed || false
     }
@@ -62,8 +62,8 @@ export function TaskForm({ onSubmit, onCancel, onDelete, initialValues }: TaskFo
 
       <Textarea
         placeholder="Description"
-        value={todo.description}
-        onChange={(e) => setTodo({ ...todo, description: e.target.value })}
+        value={todo.details}
+        onChange={(e) => setTodo({ ...todo, details: e.target.value })}
       />
 
       <div className="flex flex-wrap gap-4">
@@ -73,18 +73,18 @@ export function TaskForm({ onSubmit, onCancel, onDelete, initialValues }: TaskFo
               variant="outline"
               className={cn(
                 "justify-start text-left font-normal",
-                !todo.dueDate && "text-muted-foreground"
+                !todo.due_date && "text-muted-foreground"
               )}
             >
               <CalendarIcon className="mr-2 h-4 w-4" />
-              {todo.dueDate ? format(todo.dueDate, "PPP") : "Due Date"}
+              {todo.due_date ? format(new Date(todo.due_date), "PPP") : "Due Date"}
             </Button>
           </PopoverTrigger>
           <PopoverContent className="w-auto p-0">
             <Calendar
               mode="single"
-              selected={todo.dueDate}
-              onSelect={(date) => setTodo({ ...todo, dueDate: date })}
+              selected={new Date(todo.due_date || "")}
+              onSelect={(date) => setTodo({ ...todo, due_date: date?.toISOString().split('T')[0] || "" })}
             />
           </PopoverContent>
         </Popover>
@@ -108,7 +108,7 @@ export function TaskForm({ onSubmit, onCancel, onDelete, initialValues }: TaskFo
         {initialValues ? (
           <Button
             variant="destructive"
-            onClick={() => onDelete(initialValues.id)}
+            onClick={() => onDelete(initialValues.id || "")}
           >
             Delete Task
           </Button>

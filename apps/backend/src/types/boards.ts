@@ -23,4 +23,6 @@ export interface BoardColumn {
     title: string
     type: string
     position: number
+    itemIds?: string[]
+    settings?: Record<string, any>
 }

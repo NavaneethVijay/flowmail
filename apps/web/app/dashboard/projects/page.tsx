@@ -267,7 +267,7 @@ export default function ProjectsPage() {
                           <div className="flex  flex-1 items-center space-x-2">
                             <Mail className="h-4 w-4 text-muted-foreground" />
                             <span className="text-sm text-muted-foreground">
-                              24 Emails
+                              {project.email_count || 0} Emails
                             </span>
                           </div>
                           <Button

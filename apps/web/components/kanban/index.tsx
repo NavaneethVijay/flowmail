@@ -162,16 +162,30 @@ function Kanban<T extends KanbanItem>({
   const confirmDeleteColumn = () => {
     const { columnToDelete } = deleteColumnDialog;
     if (columnToDelete) {
-      const newColumns = { ...columns };
-      const firstColumnId = Object.keys(newColumns)[0];
-      newColumns[firstColumnId].itemIds = [
-        // @ts-ignore
-        ...newColumns[firstColumnId].itemIds,
-        // @ts-ignore
-        ...newColumns[columnToDelete].itemIds,
-      ];
-      delete newColumns[columnToDelete];
-      onColumnUpdate(newColumns);
+      const updatedColumns = { ...columns };
+      const firstColumnId = Object.keys(updatedColumns)[0];
+
+      // Move cards to the first column
+      updatedColumns[firstColumnId] = {
+        ...updatedColumns[firstColumnId],
+        itemIds: [
+          ...(updatedColumns[firstColumnId].itemIds || []),
+          ...(updatedColumns[columnToDelete].itemIds || [])
+        ]
+      };
+
+      // Update the deleted column (keep it in data but mark as deleted and empty)
+      updatedColumns[columnToDelete] = {
+        ...updatedColumns[columnToDelete],
+        itemIds: [], // Empty the cards
+        settings: {
+          ...updatedColumns[columnToDelete].settings,
+          isDeleted: true
+        }
+      };
+
+      // Update all columns through parent component
+      onColumnUpdate(updatedColumns);
     }
     setDeleteColumnDialog({ isOpen: false, columnToDelete: null });
   };

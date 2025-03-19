@@ -9,19 +9,20 @@ interface EmailProps {
   isLast: boolean;
 }
 
+const formatDate = (dateString: string) => {
+  const options: Intl.DateTimeFormatOptions = {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  };
+  return new Date(dateString).toLocaleDateString("en-US", options);
+};
+
 export function Email({ email, isLast }: EmailProps) {
   const [isOpen, setIsOpen] = useState(isLast);
-
-  const formatDate = (dateString: string) => {
-    const options: Intl.DateTimeFormatOptions = {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    };
-    return new Date(dateString).toLocaleDateString("en-US", options);
-  };
+  console.log('email in details', email);
 
   return (
     <div className="mb-4 border-b border-border">
@@ -35,9 +36,11 @@ export function Email({ email, isLast }: EmailProps) {
           </AvatarFallback>
         </Avatar>
         <div className="flex-grow">
-        <p className="text-sm font-medium">{email.from}</p>
-        <p className="text-xs text-muted-foreground">{email.from}</p>
-        <p className="text-xs text-muted-foreground">{formatDate(email.date)}</p>
+          <p className="text-sm font-medium">{email.from}</p>
+          <p className="text-xs text-muted-foreground">{email.from}</p>
+          <p className="text-xs text-muted-foreground">
+            {formatDate(email.date)}
+          </p>
         </div>
         <Button variant="ghost" size="sm" onClick={() => setIsOpen(!isOpen)}>
           {isOpen ? (
@@ -51,7 +54,7 @@ export function Email({ email, isLast }: EmailProps) {
         <div className="pr-4">
           <iframe
             srcDoc={email.body}
-            className="w-full min-h-[90vh] border-none overflow-hidden"
+            className="w-full min-h-[100vh] border-none overflow-hidden"
             sandbox="allow-same-origin"
             title="Email content"
           />

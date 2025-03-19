@@ -38,25 +38,35 @@ export class BoardColumnRepository {
     }
 
     async updateBoardColumns(boardId: number, columns: BoardColumn[], userId: string) {
-        console.log('data', {
-            columns_data: columns,
-            board_id_param: boardId,
-            user_id_param: userId
-        })
-        // Start a transaction to ensure all updates are atomic
-        const { data, error } = await supabase.rpc('update_columns_and_emails', {
-            columns_data: columns,
+        // Transform the columns data to match the expected format
+        const transformedColumns = columns.map(column => ({
+            id: column.id,
+            type: column.type,
+            settings: column.settings || {},
+            position: column.position,
+            title: column.title,
+            itemIds: column?.itemIds?.map(id => parseInt(id, 10))
+        }));
+
+        console.log('Transformed data:', {
+            columns_data: transformedColumns,
             board_id_param: boardId,
             user_id_param: userId
         });
 
-        console.log('update_columns_and_emails', JSON.stringify(data, null, 2))
+        const { data, error } = await supabase.rpc('update_columns_and_emails', {
+            columns_data: transformedColumns,
+            board_id_param: boardId,
+            user_id_param: userId
+        });
 
         if (error) {
             console.error('Error updating board columns and emails:', error);
             throw error;
         }
 
-        return true;
+        console.log('✅ Supabase RPC Success:', JSON.stringify(data, null, 2));
+
+        return data;
     }
 }

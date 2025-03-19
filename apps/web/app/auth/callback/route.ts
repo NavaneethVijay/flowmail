@@ -11,10 +11,10 @@ export async function GET(request: NextRequest) {
     response.cookies.set('access_token', accessToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      sameSite: 'none',
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
       path: '/',
-      domain: '.flowmail.in',
-      maxAge: 60 * 60 * 24 * 7,
+      domain: process.env.NODE_ENV === 'production' ? '.flowmail.in' : undefined,
+      maxAge: 60 * 60 * 24 * 7, // 1 week
     });
 
   }

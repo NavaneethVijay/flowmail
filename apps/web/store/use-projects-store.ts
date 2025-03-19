@@ -5,6 +5,7 @@ export interface Project {
   description: string;
   domain_list: string;
   id: number;
+  email_count: number;
   name: string;
   url_slug: string;
   labels?: string;

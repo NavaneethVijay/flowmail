@@ -13,14 +13,7 @@ export async function GET(
         `/projects/${id}/emails?forceRefresh=${forceRefresh}`
     );
 
-    const headers = new Headers();
-    if (!forceRefresh) {
-        headers.set('Cache-Control', 'public, max-age=600'); // Cache for 10 minutes
-    } else {
-        headers.set('Cache-Control', 'no-cache');
-    }
     return new Response(JSON.stringify(apiResponse.data), {
         status: 200,
-        headers,
     });
 }

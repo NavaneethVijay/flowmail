@@ -126,12 +126,4 @@ export default class EmailService {
     const tokens = await this.authService.refreshTokensIfNeeded()
     return this.provider.setTokens(tokens).getRecentInboxEmails(options)
   }
-
-
-  // async getAnalytics(labelId: string) {
-  //   if (!this.user) throw new Error('User not set')
-
-  //   const tokens = await this.authService.refreshTokensIfNeeded()
-  //   return this.provider.setTokens(tokens).getAnalytics(labelId)
-  // }
 }

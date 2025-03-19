@@ -6,14 +6,15 @@ import { authRouter } from './api/routes/auth.js'
 import { projectRouter } from './api/routes/projects.js'
 import { cors } from 'hono/cors'
 import { emailRouter } from './api/routes/email.js'
-
+import { todoRouter } from './api/routes/todos.js'
 const app = new Hono()
-app.use('*', logger())
+// app.use('*', logger())
 
 // Mount auth routes
 app.route('/api/auth', authRouter)
 app.route('/api/emails', emailRouter)
 app.route('/api/projects', projectRouter)
+app.route('/api/todos', todoRouter)
 
 // Root route
 app.get('/', (c) => {
@@ -30,7 +31,7 @@ app.use('/*', cors({
   credentials: true,
   allowHeaders: ['Content-Type', 'Authorization'],
   allowMethods: ['POST', 'GET', 'OPTIONS', 'DELETE', 'PUT'],
-  origin: ['http://www.flowmail.in', 'https://www.flowmail.in'],
+  origin: ['http://www.flowmail.in', 'https://www.flowmail.in', 'http://localhost:3000'],
 }))
 
 const port = 3001

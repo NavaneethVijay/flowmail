@@ -46,10 +46,10 @@ export function TaskDetail({ todo, onUpdate, onBack }: TaskDetailProps) {
             {todo.completed ? "Completed" : "Mark as complete"}
           </span>
         </div>
-        <p className="text-muted-foreground">{todo.description}</p>
+        <p className="text-muted-foreground">{todo.details}</p>
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
           <CalendarIcon className="h-4 w-4" />
-          Due: {format(todo.dueDate, "PPP")}
+          Due: {format(todo.due_date, "PPP")}
         </div>
       </motion.div>
     </div>

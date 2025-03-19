@@ -1,3 +1,4 @@
+import { Todo } from '@/components/emails/todo-list';
 import axios from 'axios';
 import { cookies } from 'next/headers';
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL + '/api';
@@ -85,6 +86,36 @@ export const emailApi = {
     },
     updateBoardColumns: async (boardId: number, columns: []) => {
         const response = await apiClient.post(`/projects/${boardId}/columns`, { columns });
+        return response.data;
+    },
+};
+
+export const todoApi = {
+    createTodo: async (data: {
+        board_email_id: string;
+        title: string;
+        details: string;
+        due_date: string;
+        priority: 'low' | 'medium' | 'high';
+        completed: boolean;
+    }) => {
+        const response = await apiClient.post('/todos', data);
+        return response.data;
+    },
+    getTodosByEmailId: async (boardEmailId: string) => {
+        const response = await apiClient.get(`/todos/email/${boardEmailId}`);
+        return response.data;
+    },
+    updateTodo: async (id: string, data: Partial<Todo>) => {
+        const response = await apiClient.put(`/todos/${id}`, data);
+        return response.data;
+    },
+    deleteTodo: async (id: string) => {
+        const response = await apiClient.delete(`/todos/${id}`);
+        return response.data;
+    },
+    toggleTodo: async (id: string) => {
+        const response = await apiClient.post(`/todos/${id}/toggle`);
         return response.data;
     },
 };
