@@ -184,8 +184,8 @@ export class BoardEmailRepository {
         return data
     }
 
-    async checkIfEmailIdIsValid(boardId: number, emailId: string) {
-        const { data, error } = await supabase.from(this.BOARD_EMAILS_TABLE).select('*').eq('board_id', boardId).eq('email_id', emailId)
+    async checkIfEmailIdIsValid(emailId: string) {
+        const { data, error } = await supabase.from(this.BOARD_EMAILS_TABLE).select('*').eq('email_id', emailId)
         if (error) {
             console.error('Error checking if email id is valid in the board:', error);
             throw error;
