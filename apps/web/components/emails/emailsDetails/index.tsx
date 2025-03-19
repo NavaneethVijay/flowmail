@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils";
 interface EmailsDetailsProps {
   selectedEmail: any;
   showSidebar?: boolean;
-  kanbanEmail: any;
+  kanbanEmail?: any;
 }
 
 export default function EmailsDetails({
