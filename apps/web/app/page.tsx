@@ -120,8 +120,11 @@ export default function Home() {
           <div className="container mx-auto px-4 text-center max-w-3xl">
             <h2 className="text-3xl font-bold mb-4">Key Features</h2>
             <p className="text-muted-foreground">
-              Take control of your emails with powerful tools designed for
-              maximum productivity.
+              Take control of your emails with powerful
+              <Link className="text-primary px-1" href={`${process.env.NEXT_PUBLIC_API_URL}/api/auth/login`}>
+                tools
+              </Link>
+              designed for maximum productivity.
             </p>
           </div>
 
