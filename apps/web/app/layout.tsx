@@ -4,6 +4,7 @@ import { Albert_Sans } from "next/font/google";
 import { ThemeProvider } from "next-themes";
 import { Toaster } from "@/components/ui/toaster";
 import { ModalProvider } from "@/context/ModalContext";
+import { Analytics } from "@vercel/analytics/react"
 
 const inter = Albert_Sans({ subsets: ["latin"] });
 
@@ -62,6 +63,7 @@ export default function RootLayout({
             <Toaster />
           </ThemeProvider>
         </ModalProvider>
+        <Analytics />
       </body>
     </html>
   );
