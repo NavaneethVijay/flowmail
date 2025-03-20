@@ -8,35 +8,38 @@ import { ModalProvider } from "@/context/ModalContext";
 const inter = Albert_Sans({ subsets: ["latin"] });
 
 export const metadata = {
-  title: 'Flowmail | Turbocharge Your Project Productivity',
-  description: 'Streamline your workflow with AI-powered project management and email capabilities. Join over 2,500 teams using our platform for enhanced productivity.',
+  title: "Flowmail | Turbocharge Your Project Productivity",
+  description:
+    "Streamline your workflow with AI-powered project management and email capabilities. Join over 2,500 teams using our platform for enhanced productivity.",
   keywords: [
-    'project management',
-    'workflow automation',
-    'email management',
-    'team collaboration',
-    'productivity tools',
-    'AI-powered platform'
+    "project management",
+    "workflow automation",
+    "email management",
+    "team collaboration",
+    "productivity tools",
+    "AI-powered platform",
   ],
   openGraph: {
-    title: 'WorkFlow AI | Turbocharge Your Team Productivity',
-    description: 'Streamline your workflow with AI-powered project management and email capabilities.',
+    title: "WorkFlow AI | Turbocharge Your Team Productivity",
+    description:
+      "Streamline your workflow with AI-powered project management and email capabilities.",
     images: [
       {
-        url: '/images/og-image.jpg', // Make sure to add this image to your public folder
+        url: "/images/og-image.jpg", // Make sure to add this image to your public folder
         width: 1200,
         height: 630,
-        alt: 'WorkFlow AI Platform Preview',
-      }
+        alt: "WorkFlow AI Platform Preview",
+      },
     ],
-    type: 'website',
+    type: "website",
   },
   twitter: {
-    card: 'summary_large_image',
-    title: 'WorkFlow AI | Turbocharge Your Team Productivity',
-    description: 'Streamline your workflow with AI-powered project management and email capabilities.',
-    images: ['/images/og-image.jpg'],
-  }
+    card: "summary_large_image",
+    title: "WorkFlow AI | Turbocharge Your Team Productivity",
+    description:
+      "Streamline your workflow with AI-powered project management and email capabilities.",
+    images: ["/images/og-image.jpg"],
+  },
 };
 
 export default function RootLayout({
@@ -51,8 +54,8 @@ export default function RootLayout({
         <ModalProvider>
           <ThemeProvider
             attribute="class"
-            defaultTheme="system"
-            enableSystem
+            defaultTheme="dark"
+            enableSystem={false}
             disableTransitionOnChange
           >
             {children}

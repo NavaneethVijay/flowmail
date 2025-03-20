@@ -7,6 +7,8 @@ import { projectRouter } from './api/routes/projects.js'
 import { cors } from 'hono/cors'
 import { emailRouter } from './api/routes/email.js'
 import { todoRouter } from './api/routes/todos.js'
+import { waitlistRouter } from './api/routes/waitlist'
+
 const app = new Hono()
 // app.use('*', logger())
 
@@ -15,7 +17,7 @@ app.route('/api/auth', authRouter)
 app.route('/api/emails', emailRouter)
 app.route('/api/projects', projectRouter)
 app.route('/api/todos', todoRouter)
-
+app.route('/api/waitlist', waitlistRouter)
 // Root route
 app.get('/', (c) => {
   return c.json({ message: 'Welcome to Gmail API Integration' })

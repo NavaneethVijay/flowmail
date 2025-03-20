@@ -8,6 +8,9 @@ import {
   MailIcon,
   ChevronDown,
   Tag,
+  Sun,
+  Moon,
+  Monitor,
 } from "lucide-react";
 import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
@@ -15,6 +18,13 @@ import { useToast } from "@/hooks/use-toast";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils";
+import { useTheme } from "next-themes";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 import {
   Sidebar,
@@ -79,6 +89,7 @@ export function AppSidebar({
   const projectProgress = (projectCount / projectLimit) * 100;
   const remainingProjects = projectLimit - projectCount;
   const [openSubmenus, setOpenSubmenus] = React.useState<string[]>([]);
+  const { setTheme, theme } = useTheme();
 
   const toggleSubmenu = (title: string) => {
     setOpenSubmenus((prev) =>
@@ -293,6 +304,36 @@ export function AppSidebar({
                 </SidebarMenuItem>
               ))}
             </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+        <SidebarGroup>
+          <SidebarGroupLabel>Appearance</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <SidebarMenuItem>
+                  {theme === 'light' && <Sun className="mr-2 h-4 w-4" />}
+                  {theme === 'dark' && <Moon className="mr-2 h-4 w-4" />}
+                  {theme === 'system' && <Monitor className="mr-2 h-4 w-4" />}
+                  {theme ? theme.charAt(0).toUpperCase() + theme.slice(1) : 'Theme'}
+                  <ChevronDown className="ml-auto h-4 w-4" />
+                </SidebarMenuItem>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start" className="w-[160px]">
+                <DropdownMenuItem onClick={() => setTheme("light")}>
+                  <Sun className="mr-2 h-4 w-4" />
+                  Light
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setTheme("dark")}>
+                  <Moon className="mr-2 h-4 w-4" />
+                  Dark
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setTheme("system")}>
+                  <Monitor className="mr-2 h-4 w-4" />
+                  System
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>

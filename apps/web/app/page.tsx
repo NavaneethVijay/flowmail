@@ -15,58 +15,56 @@ import {
   Shield,
   Users,
   Zap,
+  ListChecks,
+  Layers,
+  Filter,
+  MessageCircle,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { ModeToggle } from "../components/mode-toggle";
+import { EarlyAccessForm } from "@/components/early-access-form"
 
 export const metadata = {
-  title: 'Flowmail | Turbocharge Your Project Productivity',
-  description: 'Streamline your workflow with AI-powered project management and email capabilities. Join over 2,500 teams using our platform for enhanced productivity.',
+  title: "Flowmail | Transform Emails into Workflows",
+  description:
+    "Convert your emails into actionable tasks with an intuitive Kanban board. Organize, track, and streamline your email workflow.",
   keywords: [
-    'project management',
-    'workflow automation',
-    'email management',
-    'team collaboration',
-    'productivity tools',
-    'AI-powered platform'
+    "email management",
+    "kanban board",
+    "workflow automation",
+    "productivity tools",
+    "team collaboration",
   ],
   openGraph: {
-    title: 'WorkFlow AI | Turbocharge Your Team Productivity',
-    description: 'Streamline your workflow with AI-powered project management and email capabilities.',
+    title: "Flowmail | Transform Emails into Workflows",
+    description:
+      "Convert your emails into actionable tasks with an intuitive Kanban board.",
     images: [
       {
-        url: '/images/og-image.jpg', // Make sure to add this image to your public folder
+        url: "/images/dashboard.webp",
         width: 1200,
         height: 630,
-        alt: 'WorkFlow AI Platform Preview',
-      }
+        alt: "Flowmail Platform Preview",
+      },
     ],
-    type: 'website',
+    type: "website",
   },
-  twitter: {
-    card: 'summary_large_image',
-    title: 'WorkFlow AI | Turbocharge Your Team Productivity',
-    description: 'Streamline your workflow with AI-powered project management and email capabilities.',
-    images: ['/images/og-image.jpg'],
-  }
 };
 
 export default function Home() {
   return (
     <>
-      {/* Add Header */}
-      <header className="fixed top-0 left-0 right-0 z-50 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="max-w-6xl mx-auto  flex h-14 items-center justify-between">
+      {/* Header */}
+      <header className="fixed top-0 left-0 right-0 z-50 border-b bg-background/95 backdrop-blur">
+        <div className="max-w-6xl mx-auto px-4 flex h-14 items-center justify-between">
           <Link href="/" className="flex items-center space-x-2">
             <span className="font-bold text-xl">Flowmail</span>
           </Link>
-          <ModeToggle />
         </div>
       </header>
 
       <main className="min-h-screen">
-        {/* Hero Section - Inspired by Flowmail's clean hero */}
+        {/* Hero Section */}
         <section className="relative overflow-hidden bg-gradient-to-b from-background to-primary/5 pt-32 pb-24">
           <div className="container mx-auto px-4">
             <div className="text-center max-w-3xl mx-auto mb-20">
@@ -76,28 +74,30 @@ export default function Home() {
                 </span>
               </div>
               <h1 className="text-6xl font-bold mb-6 bg-gradient-to-r from-primary via-primary/80 to-primary/60 bg-clip-text text-transparent">
-                Turbocharge your workflow & communications
+                Transform Your Emails into Actionable Workflows
               </h1>
               <p className="text-xl text-muted-foreground mb-8">
-                Explore powerful project management tools with integrated email
-                capabilities. Streamline your team&apos;s productivity with our
-                AI-powered platform.
+                Organize, track, and manage your emails effortlessly with an
+                AI-powered Kanban board.
               </p>
               <div className="flex justify-center gap-4">
                 <Link
-                  href={`${process.env.NEXT_PUBLIC_API_URL}/api/auth/login`}
-                  className="h-12 px-8"
+                  href="#early-access"
+                  className="inline-flex items-center h-12 px-8 bg-primary text-primary-foreground hover:bg-primary/90 rounded-md"
+                  // onClick={(e) => {
+                  //   e.preventDefault();
+                  //   document.getElementById('early-access')?.scrollIntoView({
+                  //     behavior: 'smooth',
+                  //     block: 'center'
+                  //   });
+                  // }}
                 >
                   <LogIn className="mr-2 h-5 w-5" />
                   Get Early Access
                 </Link>
-                <Button size="lg" variant="outline" className="h-12 px-8">
-                  Learn More
-                  <ArrowRight className="ml-2 h-5 w-5" />
-                </Button>
               </div>
               <p className="text-sm text-muted-foreground mt-4">
-                Join over 2,500 teams already using our platform
+                Join over 200+ users already signing up for early access
               </p>
             </div>
 
@@ -115,96 +115,251 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Features Grid - Similar to Flowmail's feature presentation */}
+        {/* Features Section */}
         <section className="py-24 bg-background">
+          <div className="container mx-auto px-4 text-center max-w-3xl">
+            <h2 className="text-3xl font-bold mb-4">Key Features</h2>
+            <p className="text-muted-foreground">
+              Take control of your emails with powerful tools designed for
+              maximum productivity.
+            </p>
+          </div>
+
+          <div className="max-w-5xl mx-auto  grid md:grid-cols-3 gap-8 mt-12">
+            {[
+              {
+                icon: Send,
+                title: "Smart Email Management",
+                desc: "View, sort, and interact with emails efficiently.",
+                image: "/images/feature-1.png",
+              },
+              {
+                icon: Layers,
+                title: "Project-Based Sorting",
+                desc: "Automatically group emails by domain, label, or keywords.",
+                image: "/images/feature-2.png",
+              },
+              {
+                icon: Inbox,
+                title: "Kanban Email Board",
+                desc: "Move emails as tasks across a fully customizable Kanban board.",
+                image: "/images/feature-2.png",
+              },
+              {
+                icon: ListChecks,
+                title: "Email To-Do Lists",
+                desc: "Attach tasks to emails and track progress within the board.",
+                image: "/images/feature-1.png",
+              },
+              {
+                icon: Filter,
+                title: "AI Email Categorization",
+                desc: "Use smart filters to organize emails with AI-powered tagging.",
+                image: "/images/feature-2.png",
+              },
+              {
+                icon: MessageCircle,
+                title: "Collaboration Tools",
+                desc: "Comment, assign tasks, and work together seamlessly.",
+                image: "/images/feature-1.png",
+              },
+            ].map((feature, index) => (
+              <Card
+                key={index}
+                className="group hover:shadow-lg transition-all duration-300 border-primary/10"
+              >
+                <CardHeader>
+                  <div className="mb-4 p-3 rounded-lg bg-primary/10 w-fit group-hover:bg-primary/20 transition-colors">
+                    <feature.icon className="h-6 w-6 text-primary" />
+                  </div>
+                  <CardTitle className="text-xl mb-2">
+                    {feature.title}
+                  </CardTitle>
+                  <CardDescription>{feature.desc}</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="relative rounded-lg overflow-hidden">
+                    <Image
+                      src={feature.image}
+                      alt={feature.title}
+                      width={300}
+                      height={300}
+                      className="w-full h-auto"
+                    />
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </section>
+
+        {/* Privacy & Security Section */}
+        <section className="py-24 bg-gradient-to-b from-background to-primary/5">
           <div className="container mx-auto px-4">
-            <div className="text-center max-w-3xl mx-auto mb-16">
-              <h2 className="text-3xl font-bold mb-4">
-                Craft your personalized workflow
+            <div className="max-w-4xl mx-auto text-center mb-16">
+              <div className="inline-flex items-center justify-center p-2 rounded-full bg-primary/10 text-primary mb-6">
+                <Shield className="h-6 w-6" />
+              </div>
+              <h2 className="text-4xl font-bold mb-6">
+                Enterprise-Grade Security & Data Protection
               </h2>
-              <p className="text-muted-foreground">
-                Empower your team with customizable tools for maximum efficiency
+              <p className="text-xl text-muted-foreground">
+                Your data security is our top priority. Built in India and
+                powered by Vercel&apos;s global infrastructure, Flowmail ensures
+                robust security and data protection standards.
               </p>
             </div>
 
-            <div className="grid md:grid-cols-3 gap-8">
-              {[
-                {
-                  icon: Send,
-                  title: "Smart Email Management",
-                  desc: "AI-powered email handling with custom filters and automated responses",
-                },
-                {
-                  icon: Inbox,
-                  title: "Unified Inbox",
-                  desc: "All your communications in one place with intelligent organization",
-                },
-                {
-                  icon: BarChart,
-                  title: "Analytics Dashboard",
-                  desc: "Comprehensive insights into your team's performance and engagement",
-                },
-                {
-                  icon: Shield,
-                  title: "Enterprise Security",
-                  desc: "Bank-grade encryption and advanced security protocols",
-                },
-                {
-                  icon: Users,
-                  title: "Team Collaboration",
-                  desc: "Seamless collaboration tools for enhanced productivity",
-                },
-                {
-                  icon: Zap,
-                  title: "Automation Tools",
-                  desc: "Powerful automation to streamline repetitive tasks",
-                },
-              ].map((feature, index) => (
-                <Card
-                  key={index}
-                  className="group hover:shadow-lg transition-all duration-300 border-primary/10"
-                >
-                  <CardHeader>
-                    <div className="mb-4 p-3 rounded-lg bg-primary/10 w-fit group-hover:bg-primary/20 transition-colors">
-                      <feature.icon className="h-6 w-6 text-primary" />
+            <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+              <Card className="bg-background/50 backdrop-blur-sm">
+                <CardHeader>
+                  <div className="mb-4 p-3 rounded-lg bg-primary/10 w-fit">
+                    <Shield className="h-6 w-6 text-primary" />
+                  </div>
+                  <CardTitle>End-to-End Encryption</CardTitle>
+                  <CardDescription>
+                    All emails and data are encrypted using industry-standard
+                    AES-256 encryption, both at rest and in transit.
+                  </CardDescription>
+                </CardHeader>
+              </Card>
+
+              <Card className="bg-background/50 backdrop-blur-sm">
+                <CardHeader>
+                  <div className="mb-4 p-3 rounded-lg bg-primary/10 w-fit">
+                    <Users className="h-6 w-6 text-primary" />
+                  </div>
+                  <CardTitle>Data Protection</CardTitle>
+                  <CardDescription>
+                    Compliant with Information Technology Act, 2000 and aligned
+                    with global privacy standards.
+                  </CardDescription>
+                </CardHeader>
+              </Card>
+
+              <Card className="bg-background/50 backdrop-blur-sm">
+                <CardHeader>
+                  <div className="mb-4 p-3 rounded-lg bg-primary/10 w-fit">
+                    <BarChart className="h-6 w-6 text-primary" />
+                  </div>
+                  <CardTitle>Transparent Practices</CardTitle>
+                  <CardDescription>
+                    Clear documentation of our security measures, data handling,
+                    and privacy practices available to all users.
+                  </CardDescription>
+                </CardHeader>
+              </Card>
+            </div>
+
+            <div className="max-w-4xl mx-auto mt-16">
+              <Card className="border-primary/10">
+                <CardContent className="p-8">
+                  <div className="grid md:grid-cols-2 gap-8 items-center">
+                    <div>
+                      <h3 className="text-2xl font-semibold mb-4">
+                        Robust Security Infrastructure
+                      </h3>
+                      <ul className="space-y-4">
+                        <li className="flex items-start">
+                          <div className="mr-4 mt-1">
+                            <Shield className="h-5 w-5 text-primary" />
+                          </div>
+                          <p className="text-muted-foreground">
+                            Powered by Vercel&apos;s enterprise-grade
+                            infrastructure with global CDN
+                          </p>
+                        </li>
+                        <li className="flex items-start">
+                          <div className="mr-4 mt-1">
+                            <Shield className="h-5 w-5 text-primary" />
+                          </div>
+                          <p className="text-muted-foreground">
+                            Regular security assessments and vulnerability
+                            testing
+                          </p>
+                        </li>
+                        <li className="flex items-start">
+                          <div className="mr-4 mt-1">
+                            <Shield className="h-5 w-5 text-primary" />
+                          </div>
+                          <p className="text-muted-foreground">
+                            Multi-layer data protection with automated backups
+                            and disaster recovery
+                          </p>
+                        </li>
+                      </ul>
                     </div>
-                    <CardTitle className="text-xl mb-2">
-                      {feature.title}
-                    </CardTitle>
-                    <CardDescription>{feature.desc}</CardDescription>
-                  </CardHeader>
-                </Card>
-              ))}
+                    <div className="relative h-64">
+                      <Image
+                        src="/images/security.png"
+                        alt="Security Infrastructure"
+                        fill
+                        className="object-cover rounded-lg"
+                      />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
             </div>
           </div>
         </section>
 
-        {/* Final CTA - Similar to Flowmail's call-to-action */}
-        <section className="py-24 bg-background">
-          <div className="container mx-auto px-4">
-            <Card className="max-w-4xl mx-auto text-center bg-gradient-to-r from-primary to-primary/80">
-              <CardHeader>
-                <CardTitle className="text-3xl text-primary-foreground">
-                  Ready to transform your workflow?
-                </CardTitle>
-                <CardDescription className="text-primary-foreground/90 text-lg">
-                  Join thousands of teams already using our platform
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Button
-                  size="lg"
-                  variant="secondary"
-                  // onClick={handleGoogleSignIn}
-                  className="mt-4"
-                >
-                  <LogIn className="mr-2 h-5 w-5" />
-                  Get Early Access
-                </Button>
-              </CardContent>
-            </Card>
+        {/* Call to Action */}
+        <EarlyAccessForm />
+
+        {/* Footer */}
+        <footer className="border-t bg-background/95">
+          <div className="container mx-auto px-4 py-12">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+              {/* Brand Column */}
+              <div className="space-y-4">
+                <div className="flex items-center space-x-2">
+                  <Image
+                    src="https://placehold.co/40x40/2563eb/ffffff?text=F"
+                    alt="Flowmail Logo"
+                    width={40}
+                    height={40}
+                    className="rounded"
+                  />
+                  <span className="font-bold text-xl">Flowmail</span>
+                </div>
+                <p className="text-sm text-muted-foreground">
+                  Transform your emails into actionable workflows with
+                  AI-powered tools.
+                </p>
+              </div>
+            </div>
+
+            {/* Bottom Bar */}
+            <div className="border-t mt-12 pt-8">
+              <div className="flex flex-col md:flex-row justify-between items-center">
+                <div className="text-sm text-muted-foreground">
+                  © {new Date().getFullYear()} Flowmail. All rights reserved.
+                </div>
+                <div className="flex space-x-6 mt-4 md:mt-0">
+                  <Link
+                    href="#"
+                    className="text-sm text-muted-foreground hover:text-primary"
+                  >
+                    Twitter
+                  </Link>
+                  <Link
+                    href="#"
+                    className="text-sm text-muted-foreground hover:text-primary"
+                  >
+                    LinkedIn
+                  </Link>
+                  <Link
+                    href="#"
+                    className="text-sm text-muted-foreground hover:text-primary"
+                  >
+                    GitHub
+                  </Link>
+                </div>
+              </div>
+            </div>
           </div>
-        </section>
+        </footer>
       </main>
     </>
   );
