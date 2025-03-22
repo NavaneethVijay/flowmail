@@ -80,12 +80,12 @@ export function ProjectSettingsSheet({
             <div className="space-y-2">
               <div className="text-sm text-muted-foreground">Labels</div>
               <div className="flex flex-wrap gap-2">
-                {board.labels?.split(",").map((label: string) => (
+                {board.labels.map((label: { id: string; name: string }) => (
                   <span
-                    key={label}
+                    key={label.id}
                     className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary/10 text-primary"
                   >
-                    {label.trim()}
+                    {label.name}
                   </span>
                 ))}
               </div>
@@ -102,7 +102,9 @@ export function ProjectSettingsSheet({
                     <TooltipTrigger>
                       <Avatar className="border-2 border-background w-8 h-8">
                         <AvatarImage
-                          src={`https://api.dicebear.com/6.x/initials/svg?seed=${email.split("@")[0]}`}
+                          src={`https://api.dicebear.com/6.x/initials/svg?seed=${
+                            email.split("@")[0]
+                          }`}
                           alt={email.split("@")[0]}
                         />
                         <AvatarFallback>{email.split("@")[0]}</AvatarFallback>
@@ -130,7 +132,10 @@ export function ProjectSettingsSheet({
                         <p className="font-medium">All Members</p>
                         <div className="space-y-1">
                           {uniqueEmails.map((email) => (
-                            <p key={email} className="text-sm text-muted-foreground">
+                            <p
+                              key={email}
+                              className="text-sm text-muted-foreground"
+                            >
                               {email}
                             </p>
                           ))}

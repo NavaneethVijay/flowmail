@@ -8,7 +8,7 @@ export interface Project {
   email_count: number;
   name: string;
   url_slug: string;
-  labels?: string;
+  labels?: Label[];
   last_synced_at?: string;
 }
 

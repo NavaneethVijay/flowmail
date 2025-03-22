@@ -10,7 +10,8 @@ export class BoardRepository {
       description: board.description,
       domain_list: board.domain_list,
       url_slug: board.url_slug,
-      user_id: board.user_id
+      user_id: board.user_id,
+      labels: board.labels
     }).select()
       .single()
     if (error) {
@@ -38,7 +39,10 @@ export class BoardRepository {
   async updateBoard(board: Board) {
     const { data, error } = await supabase
       .from(this.BOARDS_TABLE)
-      .update(board)
+      .update({
+        ...board,
+        labels: board.labels
+      })
       .eq('id', board.id)
       .eq('user_id', board.user_id)
 

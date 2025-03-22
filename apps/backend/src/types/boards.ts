@@ -1,3 +1,8 @@
+export interface LabelObject {
+    id: string;
+    name: string;
+}
+
 export interface Board {
     id: number
     user_id?: string
@@ -9,7 +14,8 @@ export interface Board {
     created_at?: string
     updated_at?: string
     is_archived?: boolean
-    labels?: string
+    labels?: LabelObject[];
+    keywords?: string;
 }
 export interface BoardEmail {
     id?: number

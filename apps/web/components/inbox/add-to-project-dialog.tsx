@@ -95,9 +95,9 @@ export function AddToProjectDialog({
                   </div>
                   {project.labels && (
                     <div className="flex flex-wrap gap-2">
-                      {project.labels.split(",").map((label) => (
-                        <Badge key={label} variant="secondary">
-                          {label.trim()}
+                      {project.labels.map((label: { id: string; name: string }) => (
+                        <Badge key={label.id} variant="secondary">
+                          {label.name}
                         </Badge>
                       ))}
                     </div>

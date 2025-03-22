@@ -43,8 +43,6 @@ export class BoardEmailRepository {
             return this.decryptEmailData(email, metadataByEmailId[email.id], userKey)
         })
 
-        console.log('dataToReturn', JSON.stringify(dataToReturn, null, 2))
-
         return dataToReturn;
     }
 

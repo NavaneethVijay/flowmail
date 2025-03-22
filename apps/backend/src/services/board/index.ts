@@ -4,9 +4,9 @@ import { BoardColumnRepository } from '@/app/repository/boardColumnRepository';
 import { BoardEmailRepository } from '@/app/repository/boardEmailRepository';
 import { BoardRepository } from '@/app/repository/boardRepository';
 import { OAuthRepository } from '@/app/repository/oauthRepository';
-import type { Board, BoardColumn } from '@/types/boards'
+import type { Board, BoardColumn, LabelObject } from '@/types/boards'
 import { deriveUserKey } from '@/utils/crypto';
-import {  User } from '@supabase/supabase-js';
+import { User } from '@supabase/supabase-js';
 
 
 export default class BoardService {
@@ -100,15 +100,41 @@ export default class BoardService {
                 }
             }
             console.log('making request to google api')
-            const domains = (board.domain_list || '').split(',').map((domain: string) => domain.trim())
-            const labels = (board.labels || '')
-            .split(',')
-            .map((label: string) => label.trim())
-            .filter((label) => label !== ''); // Remove empty strings
+            // const domains = (board.domain_list || '').split(',').map((domain: string) => domain.trim())
+            // const labels = (board.labels || [])
+            //     .map((label: LabelObject) => label.id)
+            //     .filter((label: string) => label !== '');
 
-            const searchQuery = domains
-                .map((domain: string) => `{from:${domain} OR to:${domain}}`)
-                .join(' OR ')
+            // const searchQuery = domains
+            //     .map((domain: string) => `{from:${domain} OR to:${domain}}`)
+            //     .join(' OR ')
+            //     .concat('has:fullstack')
+
+            const domains = (board.domain_list || '')
+                .split(',')
+                .map((domain: string) => domain.trim())
+                .filter((domain: string) => domain !== ''); // Remove empty values
+
+            const labels = (board.labels || [])
+                .map((label: LabelObject) => label.id)
+                .filter((label: string) => label !== ''); // Ensure no empty labels
+
+            const keywords = (board.keywords || '')
+                .split(',')
+                .map((keyword: string) => keyword.trim())
+                .filter((keyword: string) => keyword !== '') // Remove empty keywords
+                .join(' '); // Combine keywords with space (Gmail treats spaces as AND)
+
+            // Construct domain-based filter
+            const domainFilter = domains.length > 0
+                ? `(${domains.map((domain: string) => `from:${domain} OR to:${domain}`).join(' OR ')})`
+                : '';
+
+            // Construct final search query
+            const searchQuery = [domainFilter, keywords]
+                .filter((part) => part) // Remove empty parts
+                .join(' '); // Concatenate with spaces
+
 
             console.log('Search query for API', JSON.stringify(searchQuery, null, 2))
             console.log('Labels for API', JSON.stringify(labels, null, 2))
@@ -116,11 +142,10 @@ export default class BoardService {
             this.provider.setTokens(tokens)
             const emails = await this.provider.searchEmails({ q: searchQuery, maxResults: 20, labelIds: labels })
             console.log("total emails from GMAIL", emails.length)
-            // get default column
+            // If emails is 0 we need to update the board and cache
             // Handle sync when columns are updated, for new emails assgin default column
             const defaultColumn = await this.boardColumnRepository.getInitialBoardColumn(boardId)
-            console.log('defaultColumn while syncing', JSON.stringify(defaultColumn, null, 2))
-            await this.boardEmailRepository.saveBoardEmails(boardId, emails as [], defaultColumn , encryptionHandler)
+            await this.boardEmailRepository.saveBoardEmails(boardId, emails as [], defaultColumn, encryptionHandler)
             const cachedEmails = await this.boardEmailRepository.getBoardEmails(boardId, encryptionHandler)
             return { emails: cachedEmails, uniqueEmails: [] }
 

@@ -11,6 +11,8 @@ import {
   Sun,
   Moon,
   Monitor,
+  InboxIcon,
+  ScrollText,
 } from "lucide-react";
 import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
@@ -23,8 +25,14 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
+import Image from "next/image";
 
 import {
   Sidebar,
@@ -69,13 +77,17 @@ const data = {
           url: "/dashboard/settings",
           icon: <Settings className="mr-2 h-4 w-4" />,
         },
+        {
+          title: "Rules",
+          url: "/dashboard/rules",
+          icon: <ScrollText className="mr-2 h-4 w-4" />,
+        },
       ],
     },
   ],
 };
 
 export function AppSidebar({
-  // @ts-expect-error - user is not defined
   user,
   ...props
 }: React.ComponentProps<typeof Sidebar>) {
@@ -129,55 +141,83 @@ export function AppSidebar({
 
   return (
     <Sidebar {...props}>
-      <SidebarHeader className="px-2 bg-muted rounded-lg m-4">
-        <div className="flex flex-col gap-2 py-2">
-          <div className="flex items-center gap-3">
-            <Avatar>
-              <AvatarImage
-                src={user?.user_metadata?.avatar_url}
-                alt={user?.email}
-              />
-              <AvatarFallback>
-                {user?.email?.charAt(0).toUpperCase()}
-              </AvatarFallback>
-            </Avatar>
-            <div className="flex flex-col">
-              <p className="text-sm font-medium leading-none">
-                {user?.user_metadata?.full_name || user?.email}
-              </p>
-              <p className="text-xs text-muted-foreground">{user?.email}</p>
-              {/* <Badge variant="secondary" className="text-xs mt-2">
-                Last synced: {new Date().toLocaleTimeString()}
-              </Badge> */}
-            </div>
-          </div>
+      <SidebarHeader className="px-4 py-2">
+        <div className="flex items-center space-x-2">
+          <Image
+            src="/logo.svg"
+            alt="Logo"
+            width={32}
+            height={32}
+          />
+          <span className="font-semibold text-xl">FlowMail</span>
         </div>
       </SidebarHeader>
-      <SidebarContent className="p-2 pt-0">
-        <SidebarGroup>
-          <SidebarGroupLabel className="text-sm font-medium">
-            Account Settings
-          </SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              <SidebarMenuItem>
-                <SidebarMenuButton
-                  asChild
-                  className="text-md mb-1 p-2 font-medium"
-                >
-                  <Link href="/dashboard">
-                    <Sparkles className="mr-2 h-4 w-4" />
-                    Upgrade Plan
-                  </Link>
-                </SidebarMenuButton>
-                <SidebarMenuButton onClick={handleSignOut}>
-                  <LogOut className="mr-2 h-4 w-4" />
-                  Sign Out
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
+
+      <SidebarContent className="p-2">
+        {/* User Profile Dropdown */}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" className="w-full px-2 py-8">
+              <div className="flex items-center gap-3">
+                <Avatar>
+                  <AvatarImage
+                    src={user?.user_metadata?.avatar_url}
+                    alt={user?.email}
+                  />
+                  <AvatarFallback>
+                    {user?.email?.charAt(0).toUpperCase()}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="flex flex-col text-left">
+                  <p className="text-sm font-medium leading-none">
+                    {user?.user_metadata?.full_name || user?.email}
+                  </p>
+                  <p className="text-xs text-muted-foreground">{user?.email}</p>
+                </div>
+                <ChevronDown className="ml-auto h-4 w-4" />
+              </div>
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="start" className="w-[200px]">
+            <DropdownMenuItem>
+              <Settings className="mr-2 h-4 w-4" />
+              Settings
+            </DropdownMenuItem>
+            <DropdownMenuItem>
+              <Sparkles className="mr-2 h-4 w-4" />
+              Upgrade Plan
+            </DropdownMenuItem>
+            <DropdownMenuSub>
+              <DropdownMenuSubTrigger>
+                {theme === 'light' && <Sun className="mr-2 h-4 w-4" />}
+                {theme === 'dark' && <Moon className="mr-2 h-4 w-4" />}
+                {theme === 'system' && <Monitor className="mr-2 h-4 w-4" />}
+                Appearance
+              </DropdownMenuSubTrigger>
+              <DropdownMenuSubContent>
+                <DropdownMenuItem onClick={() => setTheme("light")}>
+                  <Sun className="mr-2 h-4 w-4" />
+                  Light
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setTheme("dark")}>
+                  <Moon className="mr-2 h-4 w-4" />
+                  Dark
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setTheme("system")}>
+                  <Monitor className="mr-2 h-4 w-4" />
+                  System
+                </DropdownMenuItem>
+              </DropdownMenuSubContent>
+            </DropdownMenuSub>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={handleSignOut}>
+              <LogOut className="mr-2 h-4 w-4" />
+              Sign Out
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+
+        {/* Main Navigation */}
         {data.navMain.map((group) => (
           <SidebarGroup key={group.title}>
             <SidebarGroupLabel className="text-sm font-medium">
@@ -187,61 +227,28 @@ export function AppSidebar({
               <SidebarMenu>
                 {group.items.map((item) => (
                   <SidebarMenuItem key={item.title}>
-                    {/* @ts-expect-error - item.submenu is not defined */}
-                    {item.submenu ? (
-                      <>
-                        <SidebarMenuButton
-                          className="text-md mb-1 p-2 font-medium w-full flex justify-between items-center"
-                          onClick={() => toggleSubmenu(item.title)}
-                        >
-                          <span className="flex items-center">
-                            {item.icon}
-                            {item.title}
-                          </span>
-                          <ChevronDown
-                            className={`h-4 w-4 transition-transform ${
-                              openSubmenus.includes(item.title) ? "transform rotate-180" : ""
-                            }`}
-                          />
-                        </SidebarMenuButton>
-                        {openSubmenus.includes(item.title) && (
-                          <div className="ml-6 space-y-1">
-                            {/* @ts-expect-error - item.submenu is not defined */}
-                            {item.submenu.map((subItem) => (
-                              <SidebarMenuButton
-                                key={subItem.title}
-                                className="text-sm p-2 w-full"
-                                asChild
-                                isActive={pathname === subItem.url}
-                              >
-                                <Link href={subItem.url}>{subItem.title}</Link>
-                              </SidebarMenuButton>
-                            ))}
-                          </div>
-                        )}
-                      </>
-                    ) : (
-                      <SidebarMenuButton
-                        className="text-md mb-1 p-2 font-medium"
-                        asChild
-                        isActive={
-                          item.url === "/dashboard"
-                            ? pathname === item.url
-                            : pathname?.startsWith(item.url)
-                        }
-                      >
-                        <Link prefetch href={item.url}>
-                          {item.icon}
-                          {item.title}
-                        </Link>
-                      </SidebarMenuButton>
-                    )}
+                    <SidebarMenuButton
+                      className="text-md mb-1 p-2 font-medium"
+                      asChild
+                      isActive={
+                        item.url === "/dashboard"
+                          ? pathname === item.url
+                          : pathname?.startsWith(item.url || "")
+                      }
+                    >
+                      <Link prefetch href={item.url || ""}>
+                        {typeof item.icon === 'function' ? React.createElement(item.icon) : item.icon}
+                        {item.title}
+                      </Link>
+                    </SidebarMenuButton>
                   </SidebarMenuItem>
                 ))}
               </SidebarMenu>
             </SidebarGroupContent>
           </SidebarGroup>
         ))}
+
+        {/* Labels Section */}
         <SidebarGroup>
           <SidebarGroupLabel className="text-sm font-medium">
             Labels
@@ -304,38 +311,10 @@ export function AppSidebar({
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
-        <SidebarGroup>
-          <SidebarGroupLabel>Appearance</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <SidebarMenuItem>
-                  {theme === 'light' && <Sun className="mr-2 h-4 w-4" />}
-                  {theme === 'dark' && <Moon className="mr-2 h-4 w-4" />}
-                  {theme === 'system' && <Monitor className="mr-2 h-4 w-4" />}
-                  {theme ? theme.charAt(0).toUpperCase() + theme.slice(1) : 'Theme'}
-                  <ChevronDown className="ml-auto h-4 w-4" />
-                </SidebarMenuItem>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="start" className="w-[160px]">
-                <DropdownMenuItem onClick={() => setTheme("light")}>
-                  <Sun className="mr-2 h-4 w-4" />
-                  Light
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setTheme("dark")}>
-                  <Moon className="mr-2 h-4 w-4" />
-                  Dark
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setTheme("system")}>
-                  <Monitor className="mr-2 h-4 w-4" />
-                  System
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
       </SidebarContent>
+
       <SidebarFooter className="p-4">
+        {/* Project Limit Section */}
         <div className="space-y-2 rounded-lg bg-muted p-3">
           <div className="flex justify-between text-sm">
             <span className="text-muted-foreground">Project Limit</span>

@@ -14,11 +14,17 @@ import { cn } from "@/lib/utils"
 import { useProjectsStore } from "@/store/use-projects-store";
 import { Label as LabelType } from "@/store/use-projects-store";
 
+interface LabelObject {
+  id: string;
+  name: string;
+}
+
 interface ProjectFormData {
   name: string;
   description: string;
   domain_list: string;
-  labels: string;
+  labels?: LabelObject[];
+  keywords: string;
 }
 
 interface AddProjectProps {
@@ -30,7 +36,8 @@ interface AddProjectProps {
     name?: string;
     description?: string;
     domain_list?: string;
-    labels?: string;
+    labels?: LabelObject[];
+    keywords?: string;
   };
   isEditing?: boolean;
 }
@@ -46,7 +53,8 @@ export function AddProject({
     name: initialData?.name || "",
     description: initialData?.description || "",
     domain_list: initialData?.domain_list || "",
-    labels: initialData?.labels || "",
+    labels: initialData?.labels || [],
+    keywords: initialData?.keywords || "",
   });
   const [domains, setDomains] = useState<string[]>(
     initialData?.domain_list
@@ -54,14 +62,18 @@ export function AddProject({
       : initialDomains
   );
   const [domainInput, setDomainInput] = useState("");
-  const [selectedLabels, setSelectedLabels] = useState<string[]>(
-    initialData?.labels ? initialData.labels.split(",") : []
+  const [selectedLabels, setSelectedLabels] = useState<LabelObject[]>(
+    initialData?.labels || []
   );
   const { labels: sourceLabels } = useProjectsStore();
   const [labelInput, setLabelInput] = useState("");
   const { toast } = useToast();
   const [open, setOpen] = useState(false)
   const [searchTerm, setSearchTerm] = useState("");
+  const [keywords, setKeywords] = useState<string[]>(
+    initialData?.keywords ? initialData.keywords.split(",") : []
+  );
+  const [keywordInput, setKeywordInput] = useState("");
 
   interface TransformedLabel {
     value: string;
@@ -69,7 +81,7 @@ export function AddProject({
   }
 
   const transformedLabels: TransformedLabel[] = sourceLabels.labels.map((label: LabelType) => ({
-    value: label.name,
+    value: label.id,
     label: label.name
   }));
 
@@ -104,8 +116,8 @@ export function AddProject({
       e.preventDefault();
       const label = labelInput.trim();
       if (label && selectedLabels.length < 3) {
-        if (!selectedLabels.includes(label)) {
-          setSelectedLabels([...selectedLabels, label]);
+        if (!selectedLabels.some(l => l.name === label)) {
+          setSelectedLabels([...selectedLabels, { id: '', name: label }]);
           setLabelInput("");
         }
       }
@@ -113,14 +125,17 @@ export function AddProject({
   };
 
   const handleLabelRemove = (labelToRemove: string) => {
-    setSelectedLabels(selectedLabels.filter((label) => label !== labelToRemove));
+    setSelectedLabels(selectedLabels.filter((label) => label.name !== labelToRemove));
   };
 
   const handleLabelSelect = (value: string) => {
-    if (selectedLabels.includes(value)) {
-      setSelectedLabels(selectedLabels.filter((l) => l !== value));
+    const selectedLabel = sourceLabels.labels.find(label => label.id === value);
+    if (!selectedLabel) return;
+
+    if (selectedLabels.some(l => l.id === value)) {
+      setSelectedLabels(selectedLabels.filter(label => label.id !== value));
     } else if (selectedLabels.length < 3) {
-      setSelectedLabels([...selectedLabels, value]);
+      setSelectedLabels([...selectedLabels, { id: selectedLabel.id, name: selectedLabel.name }]);
     } else {
       toast({
         variant: "destructive",
@@ -128,6 +143,21 @@ export function AddProject({
         description: "You can only select up to 3 labels.",
       });
     }
+  };
+
+  const handleKeywordAdd = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      const keyword = keywordInput.trim();
+      if (keyword && !keywords.includes(keyword)) {
+        setKeywords([...keywords, keyword]);
+        setKeywordInput("");
+      }
+    }
+  };
+
+  const handleKeywordRemove = (keywordToRemove: string) => {
+    setKeywords(keywords.filter((keyword) => keyword !== keywordToRemove));
   };
 
   const handleSubmit = async () => {
@@ -146,7 +176,8 @@ export function AddProject({
       description: string;
       domain_list: string;
       url_slug: string;
-      labels: string;
+      labels: LabelObject[];
+      keywords: string;
     }
 
     let projectData: ProjectSubmitData = {
@@ -154,8 +185,12 @@ export function AddProject({
       description: formData.description,
       domain_list: domains.join(","),
       url_slug: formData.name.toLowerCase().replace(/\s+/g, "-"),
-      labels: selectedLabels.join(","),
+      labels: selectedLabels,
+      keywords: keywords.join(","),
     };
+
+    console.log('projectData to api', projectData);
+
 
     if (isEditing && initialData?.id) {
       projectData.id = initialData.id;
@@ -192,7 +227,7 @@ export function AddProject({
     <div className="sm:max-w-[425px]">
       <div className="grid gap-4 py-4">
         <div className="grid grid-cols-4 items-center gap-4">
-          <Label htmlFor="name" className="text-right">
+          <Label htmlFor="name" className="text-right text-foreground">
             Name
           </Label>
           <Input
@@ -203,7 +238,7 @@ export function AddProject({
           />
         </div>
         <div className="grid grid-cols-4 items-center gap-4">
-          <Label htmlFor="description" className="text-right">
+          <Label htmlFor="description" className="text-right text-foreground">
             Description
           </Label>
           <Textarea
@@ -219,7 +254,7 @@ export function AddProject({
           />
         </div>
         <div className="grid grid-cols-4 items-center gap-4">
-          <Label htmlFor="domain_list" className="text-right">
+          <Label htmlFor="domain_list" className="text-right text-foreground">
             Domains
           </Label>
           <div className="col-span-3 space-y-2">
@@ -249,7 +284,7 @@ export function AddProject({
           </div>
         </div>
         <div className="grid grid-cols-4 items-center gap-4">
-          <Label htmlFor="labels" className="text-right">
+          <Label htmlFor="labels" className="text-right text-foreground">
             Labels
           </Label>
           <div className="col-span-3 space-y-2">
@@ -284,7 +319,7 @@ export function AddProject({
                         <Check
                           className={cn(
                             "mr-2 h-4 w-4",
-                            selectedLabels.includes(label.value) ? "opacity-100" : "opacity-0"
+                            selectedLabels.some(l => l.id === label.value) ? "opacity-100" : "opacity-0"
                           )}
                         />
                         {label.label}
@@ -295,16 +330,46 @@ export function AddProject({
               </PopoverContent>
             </Popover>
             <div className="flex flex-wrap gap-2">
-              {selectedLabels.map((labelName) => (
+              {selectedLabels.map((label) => (
                 <Badge
-                  key={labelName}
+                  key={label.id}
                   variant="secondary"
                   className="flex items-center gap-1"
                 >
-                  {labelName}
+                  {label.name}
                   <X
                     className="h-3 w-3 cursor-pointer"
-                    onClick={() => handleLabelSelect(labelName)}
+                    onClick={() => handleLabelSelect(label.id)}
+                  />
+                </Badge>
+              ))}
+            </div>
+          </div>
+        </div>
+        <div className="grid grid-cols-4 items-center gap-4">
+          <Label htmlFor="keywords" className="text-right text-foreground">
+            Keywords
+          </Label>
+          <div className="col-span-3 space-y-2">
+            <Input
+              id="keywords"
+              value={keywordInput}
+              onChange={(e) => setKeywordInput(e.target.value)}
+              onKeyDown={handleKeywordAdd}
+              placeholder="Press Enter to add keyword"
+              className="col-span-3"
+            />
+            <div className="flex flex-wrap gap-2">
+              {keywords.map((keyword) => (
+                <Badge
+                  key={keyword}
+                  variant="secondary"
+                  className="flex items-center gap-1"
+                >
+                  {keyword}
+                  <X
+                    className="h-3 w-3 cursor-pointer"
+                    onClick={() => handleKeywordRemove(keyword)}
                   />
                 </Badge>
               ))}

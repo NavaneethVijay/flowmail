@@ -50,6 +50,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { MoreVertical, Pencil } from "lucide-react";
+import Link from "next/link";
 
 interface DomainStats {
   domain: string;
@@ -192,7 +193,7 @@ export default function ProjectsPage() {
                 ) : (
                   filteredProjects.map((project) => (
                     <Card
-                      className="hover:bg-muted/50 transition-colors"
+                      className="hover:bg-muted/50 transition-colors dark:border-neutral-800"
                       key={project.id}
                     >
                       <CardHeader className="flex flex-row items-start justify-between space-y-0 pb-2">
@@ -234,7 +235,7 @@ export default function ProjectsPage() {
                           {project.domain_list.split(",").map((domain) => (
                             <span
                               key={domain}
-                              className="inline-block m-0 items-center space-x-2 text-sm text-primary"
+                              className="inline-block m-0 items-center space-x-2 text-sm text-primary dark:text-primary"
                             >
                               @{domain.trim()}
                             </span>
@@ -243,26 +244,28 @@ export default function ProjectsPage() {
                         <div>
                           {project.labels && (
                             <div className="flex flex-wrap gap-2 my-2">
-                              {project.labels?.split(",").map((label) => (
-                                <Badge key={label} variant="secondary">
-                                  {label.trim()}
-                                </Badge>
-                              ))}
+                              {project.labels.map(
+                                (label: { id: string; name: string }) => (
+                                  <Badge key={label.id} variant="secondary">
+                                    {label.name}
+                                  </Badge>
+                                )
+                              )}
                             </div>
                           )}
                         </div>
                         <div className="text-xs mt-2 text-muted-foreground">
                           Last Sync:
                           <span className="inline-block px-2">
-                          {project.last_synced_at
-                            ? new Date(
-                                project.last_synced_at
-                              ).toLocaleString()
-                            : "Never"}
+                            {project.last_synced_at
+                              ? new Date(
+                                  project.last_synced_at
+                                ).toLocaleString()
+                              : "Never"}
                           </span>
                         </div>
                       </CardContent>
-                      <CardFooter className="pb-2 border-t mt-4 pt-2 border-neutral-200">
+                      <CardFooter className="pb-2 border-t mt-4 pt-2 border-neutral-200 dark:border-neutral-800">
                         <div className="flex justify-between w-full space-x-4">
                           <div className="flex  flex-1 items-center space-x-2">
                             <Mail className="h-4 w-4 text-muted-foreground" />
@@ -270,20 +273,14 @@ export default function ProjectsPage() {
                               {project.email_count || 0} Emails
                             </span>
                           </div>
-                          <Button
-                            onClick={() =>
-                              router.push(
-                                `/dashboard/projects/${project.url_slug}`
-                              )
-                            }
-                            variant="expandIcon"
-                            Icon={() => (
-                              <ChevronRight className="ml-2 h-4 w-4" />
-                            )}
-                            iconPlacement="right"
+                          <Link
+                            href={`/dashboard/projects/${project.url_slug}`}
+                            prefetch={true}
+                            className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground shadow hover:bg-primary/90 h-9 px-4 py-2"
                           >
                             View Board
-                          </Button>
+                            <ChevronRight className="ml-2 h-4 w-4" />
+                          </Link>
                         </div>
                       </CardFooter>
                     </Card>
@@ -292,7 +289,7 @@ export default function ProjectsPage() {
               </div>
             </div>
             <div className="w-[400px] space-y-4">
-              <Card className="bg-primary/0">
+              <Card className="bg-primary/0 dark:border-neutral-800">
                 <CardHeader>
                   <CardTitle className="text-lg">Suggested Projects</CardTitle>
                   <CardDescription>
@@ -313,11 +310,11 @@ export default function ProjectsPage() {
                     <ScrollArea className="h-[600px] overflow-y-auto overflow-x-hidden ">
                       {domainStats.slice(0, 6).map((domain, index) => (
                         <div
-                          className="rounded-lg p-2 mb-4 overflow-hidden bg-primary/5 border border-neutral-200"
+                          className="rounded-lg p-2 mb-4 overflow-hidden bg-primary/5 border border-neutral-200 dark:border-neutral-800 dark:bg-primary/10"
                           key={index}
                         >
                           <div className="grid grid-cols-[40px_140px_120px] gap-4 items-center">
-                            <Avatar className="w-[40px] h-[40px] bg-white rounded-lg overflow-hidden border border-neutral-200">
+                            <Avatar className="w-[40px] h-[40px] bg-white dark:bg-neutral-900 rounded-lg overflow-hidden border border-neutral-200 dark:border-neutral-800">
                               <AvatarImage
                                 width={40}
                                 height={40}
