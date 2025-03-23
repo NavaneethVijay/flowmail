@@ -265,6 +265,7 @@ export default function ProjectBoard() {
               <div className="flex items-center gap-4">
                 <Link href="/dashboard/projects">
                   <Button variant="ghost" size="icon">
+                    {/* @ts-ignore */}
                     <ArrowLeftIcon className="w-6 h-6 text-muted-foreground" />
                     <span className="hidden">Back</span>
                   </Button>
@@ -284,6 +285,7 @@ export default function ProjectBoard() {
           </div>
           <div className="w-3/12 pr-10 flex justify-end gap-2">
             <Button variant="outline" onClick={() => setIsSettingsOpen(true)}>
+              {/* @ts-ignore */}
               <NotebookText className="w-4 h-4" />
               <span className="ml-2">View Board</span>
             </Button>
