@@ -29,6 +29,7 @@ import { formatEmailDate } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import { useProjectsStore } from "@/store/use-projects-store";
 import { cn } from "@/lib/utils";
+import { PageLayout } from "@/components/PageLayout";
 
 // Sample data
 // const recentProjects = [
@@ -155,168 +156,163 @@ export default function DashboardPage() {
   }, []);
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="border-b">
-        <div className="flex h-16 items-center px-4 md:px-6">
-          <h1 className="text-2xl font-semibold">Dashboard</h1>
-        </div>
-      </div>
+    <PageLayout title="Dashboard">
+      <div className="space-y-6">
+        {/* Main Content */}
+        <div className="p-4 md:p-6 space-y-6">
+          {/* Quick Actions Section */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            {quickActions.map((action) => (
+              <Card
+                key={action.title}
+                className="hover:bg-muted/50 transition-colors"
+              >
+                <CardContent className="p-4 flex items-center space-x-4">
+                  <action.icon className={cn("h-5 w-5", action.color)} />
+                  <span className="font-medium">{action.title}</span>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
 
-      {/* Main Content */}
-      <div className="p-4 md:p-6 space-y-6">
-        {/* Quick Actions Section */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          {quickActions.map((action) => (
-            <Card
-              key={action.title}
-              className="hover:bg-muted/50 transition-colors"
-            >
-              <CardContent className="p-4 flex items-center space-x-4">
-                <action.icon className={cn("h-5 w-5", action.color)} />
-                <span className="font-medium">{action.title}</span>
+          {/* Main Content Grid */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Recent Emails */}
+            <Card className="lg:col-span-1">
+              <CardHeader className="flex flex-row items-center justify-between">
+                <CardTitle>Recent Emails</CardTitle>
+                <Link href="/dashboard/inbox">
+                  <Button variant="ghost" className="text-sm">
+                    View Inbox
+                    <ArrowRight className="ml-2 h-4 w-4" />
+                  </Button>
+                </Link>
+              </CardHeader>
+              <CardContent>
+                <ScrollArea className="h-[300px] md:h-[400px]">
+                  <div className="space-y-4">
+                    {loading ? (
+                      <div className="space-y-4">
+                        {[...Array(3)].map((_, i) => (
+                          <div key={i} className="flex items-center space-x-4">
+                            <div className="h-10 w-10 rounded-full bg-muted animate-pulse" />
+                            <div className="space-y-2 flex-1">
+                              <div className="h-4 w-1/4 bg-muted animate-pulse rounded" />
+                              <div className="h-4 w-3/4 bg-muted animate-pulse rounded" />
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    ) : recentEmails.length > 0 ? (
+                      recentEmails.map((email) => (
+                        <div
+                          key={email.id}
+                          className="flex items-start space-x-4 p-2 -mx-2 rounded-lg hover:bg-muted/50 transition-colors"
+                        >
+                          <Avatar className="h-10 w-10">
+                            <AvatarImage
+                              src={`https://avatar.vercel.sh/${email.from}.png`}
+                            />
+                            <AvatarFallback>
+                              {email.from.charAt(0).toUpperCase()}
+                            </AvatarFallback>
+                          </Avatar>
+                          <div className="flex-1 space-y-1">
+                            <div className="flex items-center justify-between">
+                              <p className="text-sm font-medium leading-none">
+                                {email.from.split("@")[0]}
+                              </p>
+                              <span className="text-xs text-muted-foreground">
+                                {formatEmailDate(email.date)}
+                              </span>
+                            </div>
+                            <p className="text-sm text-muted-foreground line-clamp-2">
+                              {email.subject}
+                            </p>
+                            <div className="flex items-center gap-2">
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="h-8 text-xs"
+                                onClick={() => handleAddToProject(email)}
+                              >
+                                <PlusCircle className="mr-2 h-3 w-3" />
+                                Add to Project
+                              </Button>
+                            </div>
+                          </div>
+                        </div>
+                      ))
+                    ) : (
+                      <div className="text-center py-4 text-sm text-muted-foreground">
+                        No recent emails
+                      </div>
+                    )}
+                  </div>
+                </ScrollArea>
               </CardContent>
             </Card>
-          ))}
-        </div>
 
-        {/* Main Content Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Recent Emails */}
-          <Card className="lg:col-span-1">
-            <CardHeader className="flex flex-row items-center justify-between">
-              <CardTitle>Recent Emails</CardTitle>
-              <Link href="/dashboard/inbox">
-                <Button variant="ghost" className="text-sm">
-                  View Inbox
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Button>
-              </Link>
-            </CardHeader>
-            <CardContent>
-              <ScrollArea className="h-[300px] md:h-[400px]">
+            {/* Project Overview */}
+            <Card className="lg:col-span-1">
+              <CardHeader className="flex flex-row items-center justify-between space-x-2">
+                <CardTitle>Project Overview</CardTitle>
+                <Link href="/dashboard/projects">
+                  <Button variant="ghost" className="text-sm whitespace-nowrap">
+                    View all
+                    <ArrowRight className="ml-2 h-4 w-4" />
+                  </Button>
+                </Link>
+              </CardHeader>
+              <CardContent>
                 <div className="space-y-4">
-                  {loading ? (
-                    <div className="space-y-4">
-                      {[...Array(3)].map((_, i) => (
-                        <div key={i} className="flex items-center space-x-4">
-                          <div className="h-10 w-10 rounded-full bg-muted animate-pulse" />
-                          <div className="space-y-2 flex-1">
-                            <div className="h-4 w-1/4 bg-muted animate-pulse rounded" />
-                            <div className="h-4 w-3/4 bg-muted animate-pulse rounded" />
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  ) : recentEmails.length > 0 ? (
-                    recentEmails.map((email) => (
-                      <div
-                        key={email.id}
-                        className="flex items-start space-x-4 p-2 -mx-2 rounded-lg hover:bg-muted/50 transition-colors"
+                  {recentProjects.length > 0 ? (
+                    recentProjects.map((project) => (
+                      <Link
+                        href={`/dashboard/projects/${project.slug}`}
+                        key={project.name}
+                        className="block hover:bg-muted/50 rounded-lg p-2 -mx-2 transition-colors"
                       >
-                        <Avatar className="h-10 w-10">
-                          <AvatarImage
-                            src={`https://avatar.vercel.sh/${email.from}.png`}
-                          />
-                          <AvatarFallback>
-                            {email.from.charAt(0).toUpperCase()}
-                          </AvatarFallback>
-                        </Avatar>
-                        <div className="flex-1 space-y-1">
-                          <div className="flex items-center justify-between">
-                            <p className="text-sm font-medium leading-none">
-                              {email.from.split("@")[0]}
-                            </p>
-                            <span className="text-xs text-muted-foreground">
-                              {formatEmailDate(email.date)}
-                            </span>
+                        <div className="space-y-2">
+                          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                            <div className="flex items-center space-x-2">
+                              <FolderKanban className="h-4 w-4 text-muted-foreground shrink-0" />
+                              <span className="font-medium truncate">
+                                {project.name}
+                              </span>
+                            </div>
+                            <Badge variant="secondary" className="w-fit">
+                              {project.emails} emails
+                            </Badge>
                           </div>
-                          <p className="text-sm text-muted-foreground line-clamp-2">
-                            {email.subject}
-                          </p>
-                          <div className="flex items-center gap-2">
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              className="h-8 text-xs"
-                              onClick={() => handleAddToProject(email)}
-                            >
-                              <PlusCircle className="mr-2 h-3 w-3" />
-                              Add to Project
-                            </Button>
-                          </div>
+                          <Progress value={project.progress} className="h-2" />
                         </div>
-                      </div>
+                      </Link>
                     ))
                   ) : (
                     <div className="text-center py-4 text-sm text-muted-foreground">
-                      No recent emails
+                      <p>No projects yet.</p>
+                      <Button
+                        variant="link"
+                        onClick={() => router.push("/dashboard/projects")}
+                        className="mt-2"
+                      >
+                        Create your first project
+                      </Button>
                     </div>
                   )}
                 </div>
-              </ScrollArea>
-            </CardContent>
-          </Card>
-
-          {/* Project Overview */}
-          <Card className="lg:col-span-1">
-            <CardHeader className="flex flex-row items-center justify-between space-x-2">
-              <CardTitle>Project Overview</CardTitle>
-              <Link href="/dashboard/projects">
-                <Button variant="ghost" className="text-sm whitespace-nowrap">
-                  View all
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Button>
-              </Link>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {recentProjects.length > 0 ? (
-                  recentProjects.map((project) => (
-                    <Link
-                      href={`/dashboard/projects/${project.slug}`}
-                      key={project.name}
-                      className="block hover:bg-muted/50 rounded-lg p-2 -mx-2 transition-colors"
-                    >
-                      <div className="space-y-2">
-                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                          <div className="flex items-center space-x-2">
-                            <FolderKanban className="h-4 w-4 text-muted-foreground shrink-0" />
-                            <span className="font-medium truncate">
-                              {project.name}
-                            </span>
-                          </div>
-                          <Badge variant="secondary" className="w-fit">
-                            {project.emails} emails
-                          </Badge>
-                        </div>
-                        <Progress value={project.progress} className="h-2" />
-                      </div>
-                    </Link>
-                  ))
-                ) : (
-                  <div className="text-center py-4 text-sm text-muted-foreground">
-                    <p>No projects yet.</p>
-                    <Button
-                      variant="link"
-                      onClick={() => router.push("/dashboard/projects")}
-                      className="mt-2"
-                    >
-                      Create your first project
-                    </Button>
-                  </div>
-                )}
-              </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+          </div>
         </div>
-      </div>
 
-      <AddToProjectDialog
-        open={isAddToProjectOpen}
-        onOpenChange={setIsAddToProjectOpen}
-        onSubmit={handleProjectSelect}
-      />
-    </div>
+        <AddToProjectDialog
+          open={isAddToProjectOpen}
+          onOpenChange={setIsAddToProjectOpen}
+          onSubmit={handleProjectSelect}
+        />
+      </div>
+    </PageLayout>
   );
 }

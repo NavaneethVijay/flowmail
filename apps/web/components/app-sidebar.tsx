@@ -13,6 +13,7 @@ import {
   Monitor,
   InboxIcon,
   ScrollText,
+  BarChart3,
 } from "lucide-react";
 import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
@@ -82,6 +83,11 @@ const data = {
           url: "/dashboard/rules",
           icon: <ScrollText className="mr-2 h-4 w-4" />,
         },
+        {
+          title: "Analytics",
+          url: "/dashboard/analytics",
+          icon: <BarChart3 className="mr-2 h-4 w-4" />,
+        },
       ],
     },
   ],
@@ -140,7 +146,7 @@ export function AppSidebar({
   };
 
   return (
-    <Sidebar {...props}>
+    <Sidebar collapsible="offcanvas" {...props}>
       <SidebarHeader className="px-4 py-2">
         <div className="flex items-center space-x-2">
           <Image

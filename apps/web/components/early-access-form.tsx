@@ -73,7 +73,7 @@ export function EarlyAccessForm() {
   };
 
   return (
-    <section id="early-access" className="py-24 bg-background">
+    <section id="early-access" className="py-24 bg-gradient-to-b from-primary/5 to-background">
       <div className="container mx-auto px-4 text-center">
         <Card className="max-w-4xl mx-auto bg-gradient-to-b from-primary/10 to-primary/5">
           <CardHeader>

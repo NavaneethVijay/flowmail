@@ -65,7 +65,7 @@ export default function Home() {
 
       <main className="min-h-screen">
         {/* Hero Section */}
-        <section className="relative overflow-hidden bg-gradient-to-b from-background to-primary/5 pt-32 pb-24">
+        <section className="relative overflow-hidden bg-gradient-to-b from-background to-black/5 pt-32 pb-24">
           <div className="container mx-auto px-4">
             <div className="text-center max-w-3xl mx-auto mb-20">
               <div className="inline-block mb-6">
@@ -254,7 +254,7 @@ export default function Home() {
               </Card>
             </div>
 
-            <div className="max-w-4xl mx-auto mt-16">
+            <div className="max-w-4xl mx-auto mt-16 ">
               <Card className="border-primary/10">
                 <CardContent className="p-8">
                   <div className="grid md:grid-cols-2 gap-8 items-center">
@@ -311,7 +311,7 @@ export default function Home() {
         <EarlyAccessForm />
 
         {/* Footer */}
-        <footer className="border-t bg-background/95">
+        <footer className="border-t bg-background">
           <div className="container mx-auto px-4 py-12">
             <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
               {/* Brand Column */}
