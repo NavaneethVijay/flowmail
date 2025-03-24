@@ -1,4 +1,3 @@
-// @ts-nocheck
 "use client";
 
 import { Button } from "@/components/ui/button";
@@ -53,14 +52,11 @@ import {
 import { MoreVertical, Pencil } from "lucide-react";
 import Link from "next/link";
 import { PageLayout } from "@/components/PageLayout";
+import { useAddProject } from "@/context/AddProjectContext";
 
-interface DomainStats {
-  domain: string;
-  count: number;
-  image: string;
-}
 
 export default function ProjectsPage() {
+  const { openAddProject } = useAddProject();
   const router = useRouter();
   const { projects, domainStats, setProjects, removeProject } =
     useProjectsStore();
@@ -68,7 +64,6 @@ export default function ProjectsPage() {
   const { openModal, closeModal } = useModal();
   const [searchTerm, setSearchTerm] = useState("");
   const [projectToDelete, setProjectToDelete] = useState<number | null>(null);
-
   useEffect(() => {
     fetchProjects();
   }, []);
@@ -121,34 +116,25 @@ export default function ProjectsPage() {
   };
 
   const handleNewProject = (domain?: string) => {
-    const initialDomains = domain ? [domain] : [];
-    openModal({
-      title: "Create a Project",
-      description: "Create a new project to manage your emails.",
-      content: (
-        <AddProject
-          onSuccess={fetchProjects}
-          onClose={closeModal}
-          initialDomains={initialDomains}
-        />
-      ),
-      actions: null,
-    });
+    const initialData = domain ? {
+      domain_list: domain,
+      name: '',
+      description: '',
+      labels: [],
+      keywords: '',
+    } : undefined;
+
+    openAddProject(initialData);
   };
 
   const handleEditProject = (project: any) => {
-    openModal({
-      title: "Edit Project",
-      description: "Update your project details.",
-      content: (
-        <AddProject
-          onSuccess={fetchProjects}
-          onClose={closeModal}
-          initialData={project}
-          isEditing={true}
-        />
-      ),
-      actions: null,
+    openAddProject({
+      id: project.id,
+      name: project.name,
+      description: project.description,
+      domain_list: project.domain_list,
+      labels: project.labels || [],
+      keywords: project.keywords || '',
     });
   };
 

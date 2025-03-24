@@ -5,6 +5,7 @@ import { ThemeProvider } from "next-themes";
 import { Toaster } from "@/components/ui/toaster";
 import { ModalProvider } from "@/context/ModalContext";
 import { Analytics } from "@vercel/analytics/react"
+import { AddProjectProvider } from "@/context/AddProjectContext";
 
 const inter = Albert_Sans({ subsets: ["latin"] });
 
@@ -59,7 +60,9 @@ export default function RootLayout({
             enableSystem={false}
             disableTransitionOnChange
           >
-            {children}
+            <AddProjectProvider>
+              {children}
+            </AddProjectProvider>
             <Toaster />
           </ThemeProvider>
         </ModalProvider>

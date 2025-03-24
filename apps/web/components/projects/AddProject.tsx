@@ -23,6 +23,7 @@ import { Check, ChevronsUpDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useProjectsStore } from "@/store/use-projects-store";
 import { Label as LabelType } from "@/store/use-projects-store";
+import { ChipsInput } from "@/components/ui/chips-input";
 
 interface LabelObject {
   id: string;
@@ -105,46 +106,6 @@ export function AddProject({
     ? filteredLabels
     : transformedLabels.slice(0, 5);
 
-  const handleDomainAdd = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter") {
-      e.preventDefault();
-
-      const domain = domainInput.trim();
-      if (domain) {
-        const formattedDomain = domain.startsWith("@")
-          ? domain.slice(1)
-          : domain;
-        if (!domains.includes(formattedDomain)) {
-          setDomains([...domains, formattedDomain]);
-          setDomainInput("");
-        }
-      }
-    }
-  };
-
-  const handleDomainRemove = (domainToRemove: string) => {
-    setDomains(domains.filter((domain) => domain !== domainToRemove));
-  };
-
-  const handleLabelAdd = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      const label = labelInput.trim();
-      if (label && selectedLabels.length < 3) {
-        if (!selectedLabels.some((l) => l.name === label)) {
-          setSelectedLabels([...selectedLabels, { id: "", name: label }]);
-          setLabelInput("");
-        }
-      }
-    }
-  };
-
-  const handleLabelRemove = (labelToRemove: string) => {
-    setSelectedLabels(
-      selectedLabels.filter((label) => label.name !== labelToRemove)
-    );
-  };
-
   const handleLabelSelect = (value: string) => {
     const selectedLabel = sourceLabels.labels.find(
       (label) => label.id === value
@@ -165,21 +126,6 @@ export function AddProject({
         description: "You can only select up to 3 labels.",
       });
     }
-  };
-
-  const handleKeywordAdd = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      const keyword = keywordInput.trim();
-      if (keyword && !keywords.includes(keyword)) {
-        setKeywords([...keywords, keyword]);
-        setKeywordInput("");
-      }
-    }
-  };
-
-  const handleKeywordRemove = (keywordToRemove: string) => {
-    setKeywords(keywords.filter((keyword) => keyword !== keywordToRemove));
   };
 
   const handleSubmit = async () => {
@@ -248,7 +194,7 @@ export function AddProject({
   };
 
   return (
-    <div className="sm:max-w-[425px]">
+    <div className="w-full">
       <div className="grid gap-4 py-4">
         <div className="grid grid-cols-4 items-center gap-4">
           <Label htmlFor="name" className="text-right text-foreground">
@@ -282,6 +228,25 @@ export function AddProject({
             Domains
           </Label>
           <div className="col-span-3 space-y-2">
+            <ChipsInput
+              value={domains}
+              onChange={setDomains}
+              placeholder="Press Enter to add domain"
+              prependSymbol="@"
+              validate={(value) => {
+                if (value.includes("@")) {
+                  toast({
+                    variant: "destructive",
+                    title: "Invalid domain",
+                    description: "Please enter domain without @ symbol",
+                  });
+                  return false;
+                }
+                return true;
+              }}
+            />
+          </div>
+          {/* <div className="col-span-3 space-y-2">
             <Input
               id="domain_list"
               value={domainInput}
@@ -305,7 +270,7 @@ export function AddProject({
                 </Badge>
               ))}
             </div>
-          </div>
+          </div> */}
         </div>
         <div className="grid grid-cols-4 items-center gap-4">
           <Label htmlFor="labels" className="text-right text-foreground">
@@ -377,7 +342,12 @@ export function AddProject({
             Keywords
           </Label>
           <div className="col-span-3 space-y-2">
-            <Input
+            <ChipsInput
+              value={keywords}
+              onChange={setKeywords}
+              placeholder="Press Enter to add keyword"
+            />
+            {/* <Input
               id="keywords"
               value={keywordInput}
               onChange={(e) => setKeywordInput(e.target.value)}
@@ -399,7 +369,7 @@ export function AddProject({
                   />
                 </Badge>
               ))}
-            </div>
+            </div> */}
           </div>
         </div>
       </div>
