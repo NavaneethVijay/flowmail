@@ -20,7 +20,7 @@ export default function InboxMain() {
     <PageLayout title="Inbox">
       <ResizablePanelGroup
         direction="horizontal"
-        className="min-h-100vh max-h-100vh rounded-lg border"
+        className="min-h-100vh max-h-100vh"
       >
         <ResizablePanel defaultSize={40}>
           <EmailList

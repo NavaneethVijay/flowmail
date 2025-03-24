@@ -1,21 +1,14 @@
 import apiClient from "@/lib/server-api-client";
-import { cookies } from "next/headers";
-import { NextRequest } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(request: NextRequest) {
     const response = await apiClient.post('/auth/logout');
+
+    const res = new NextResponse(JSON.stringify(response.data), { status: response.status });
+
     if (response.status === 200) {
-        // @ts-ignore
-        cookies().set('access_token', '', {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-            path: '/',
-            domain: process.env.NODE_ENV === 'production' ? '.flowmail.in' : undefined,
-            maxAge: 0  // This ensures the cookie is immediately expired
-        });
-        // @ts-ignore
-        cookies().delete('access_token');
+        res.headers.append('Set-Cookie', `access_token=; Path=/; HttpOnly; Secure=${process.env.NODE_ENV === 'production' ? 'true' : 'false'}; SameSite=${process.env.NODE_ENV === 'production' ? 'None' : 'Lax'}; Max-Age=0; Domain=${process.env.NODE_ENV === 'production' ? '.flowmail.in' : ''}`);
     }
-    return new Response(JSON.stringify(response.data), { status: response.status });
+
+    return res;
 }

@@ -74,7 +74,11 @@ const config: Config = {
 				}
 			},
 			keyframes: {
-				"shine": {
+				fadeIn: {
+					"0%": { opacity: "0" },
+					"100%": { opacity: "1" },
+				},
+				shine: {
 					from: { backgroundPosition: '200% 0' },
 					to: { backgroundPosition: '-200% 0' },
 				},
@@ -99,6 +103,7 @@ const config: Config = {
 				'accordion-down': 'accordion-down 0.2s ease-out',
 				'accordion-up': 'accordion-up 0.2s ease-out',
 				"shine": "shine 8s ease-in-out infinite",
+				"fadeIn": "fadeIn 0.5s ease-in-out",
 			}
 		}
 	},

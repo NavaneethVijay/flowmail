@@ -1,9 +1,18 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Button } from "@/components/ui/button"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { ChevronLeft, ChevronRight, Reply, ReplyAll, Forward, MoreHorizontal, Star, Trash } from 'lucide-react'
+import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {
+  ChevronLeft,
+  ChevronRight,
+  Reply,
+  ReplyAll,
+  Forward,
+  MoreHorizontal,
+  Star,
+  Trash,
+} from "lucide-react";
 import { format } from "date-fns";
 import EmailsDetails from "@/components/emails/emailsDetails";
 import type { Email } from "./email-list";
@@ -42,11 +51,15 @@ export default function EmailDetail({ threadId }: EmailDetailProps) {
       </div>
     );
   }
-
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-full">
-        Loading...
+      <div className="flex flex-col items-center justify-center h-full space-y-3 animate-fadeIn">
+        <div className="flex items-center space-x-2">
+          <div className="h-5 w-5 animate-spin rounded-full border-2 border-gray-300 border-t-gray-600"></div>
+          <p className="text-sm font-medium text-gray-600 animate-pulse">
+            Fetching your email...
+          </p>
+        </div>
       </div>
     );
   }

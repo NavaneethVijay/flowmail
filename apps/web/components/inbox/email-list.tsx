@@ -156,22 +156,9 @@ export default function EmailList({ onEmailSelect }: EmailListProps) {
   };
 
   return (
-    <div className="h-full flex flex-col bg-white">
-      <div className="p-4 border-b">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-2xl font-bold text-gray-800">Inbox</h2>
-          {/* <div className="text-sm text-gray-600">
-            <span className="mr-2">{emails.length} emails</span>
-          </div> */}
-        </div>
-        {/* <Input
-          type="search"
-          placeholder="Search in emails"
-          className="w-full"
-        /> */}
-      </div>
-      <div className="p-2 border-b flex justify-between items-center bg-gray-50">
-        <div className="flex items-center">
+    <div className="h-full flex flex-1 flex-col bg-background">
+      <div className="p-2 border-b flex justify-between items-center bg-background">
+        <div className="flex items-center px-2">
           <Checkbox
             checked={selectedEmails.length === emails.length}
             onCheckedChange={toggleAllEmails}
@@ -181,7 +168,7 @@ export default function EmailList({ onEmailSelect }: EmailListProps) {
           <Button
             variant="outline"
             size="sm"
-            className="text-gray-600"
+            className="text-foreground"
             onClick={() => setIsAddToProjectOpen(true)}
             disabled={selectedEmails.length === 0}
           >
@@ -225,8 +212,8 @@ export default function EmailList({ onEmailSelect }: EmailListProps) {
                 <div
                   key={email.id}
                   className={cn(
-                    "flex items-center p-2 border-b hover:bg-gray-50 cursor-pointer",
-                    selectedThreadId === email.threadId ? "bg-gray-100" : ""
+                    "flex items-center p-2 px-4 border-b hover:bg-muted cursor-pointer",
+                    selectedThreadId === email.threadId ? "bg-muted" : ""
                   )}
                   onClick={() => handleEmailClick(email)}
                 >
@@ -234,14 +221,14 @@ export default function EmailList({ onEmailSelect }: EmailListProps) {
                     checked={selectedEmails.includes(email.id)}
                     onCheckedChange={() => toggleEmailSelection(email.id)}
                     aria-label={`Select email from ${email.from}`}
-                    className="mr-2"
+                    className="mr-4"
                   />
                   <TooltipProvider>
                     <Tooltip>
                       <TooltipTrigger asChild>
                         <Avatar className="h-8 w-8 mr-3">
                           <AvatarImage
-                            src={`https://api.dicebear.com/6.x/initials/svg?seed=${email.from}`}
+                            src={`https://avatar.vercel.sh/${email.from}.png`}
                             alt={displayName}
                           />
                           <AvatarFallback>

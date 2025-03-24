@@ -145,7 +145,7 @@ export default function DashboardPage() {
       try {
         const res = await fetch(`/api/emails?pageToken=${pageToken || ""}`);
         const data = await res.json();
-        setRecentEmails(data.emails.slice(0, 3));
+        setRecentEmails(data.emails.slice(0, 5));
       } catch (error) {
         console.error("Failed to fetch emails:", error);
       } finally {
@@ -189,9 +189,9 @@ export default function DashboardPage() {
                   </Button>
                 </Link>
               </CardHeader>
-              <CardContent>
+              <CardContent className="px-0">
                 <ScrollArea className="h-[300px] md:h-[400px]">
-                  <div className="space-y-4">
+                  <div className="space-y-4 px-4">
                     {loading ? (
                       <div className="space-y-4">
                         {[...Array(3)].map((_, i) => (
@@ -208,7 +208,7 @@ export default function DashboardPage() {
                       recentEmails.map((email) => (
                         <div
                           key={email.id}
-                          className="flex items-start space-x-4 p-2 -mx-2 rounded-lg hover:bg-muted/50 transition-colors"
+                          className="flex items-start space-x-4 p-2  rounded-lg hover:bg-muted/50 transition-colors"
                         >
                           <Avatar className="h-10 w-10">
                             <AvatarImage
