@@ -91,18 +91,15 @@ export function AddProject({
 
   const visibleLabels = searchTerm ? filteredLabels : transformedLabels.slice(0, 5);
 
-  const handleDomainAdd = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      const domain = domainInput.trim();
-      if (domain) {
-        const formattedDomain = domain.startsWith("@")
-          ? domain.slice(1)
-          : domain;
-        if (!domains.includes(formattedDomain)) {
-          setDomains([...domains, formattedDomain]);
-          setDomainInput("");
-        }
+  const handleDomainAdd = (e: React.KeyboardEvent<HTMLInputElement> | React.FormEvent) => {
+    e.preventDefault();
+
+    const domain = domainInput.trim();
+    if (domain) {
+      const formattedDomain = domain.startsWith("@") ? domain.slice(1) : domain;
+      if (!domains.includes(formattedDomain)) {
+        setDomains([...domains, formattedDomain]);
+        setDomainInput("");
       }
     }
   };
@@ -262,7 +259,12 @@ export function AddProject({
               id="domain_list"
               value={domainInput}
               onChange={(e) => setDomainInput(e.target.value)}
-              onKeyDown={handleDomainAdd}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  handleDomainAdd(e);
+                }
+              }}
+              onSubmit={handleDomainAdd}
               placeholder="Press Enter to add domain"
               className="col-span-3"
             />

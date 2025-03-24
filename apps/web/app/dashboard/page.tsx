@@ -19,6 +19,14 @@ import {
   Mail,
   ArrowRight,
 } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+
 import { useRouter } from "next/navigation";
 import { format } from "date-fns";
 import { useModal } from "@/context/ModalContext";
@@ -32,19 +40,65 @@ import { useProjectsStore } from "@/store/use-projects-store";
 import { cn } from "@/lib/utils";
 import { PageLayout } from "@/components/PageLayout";
 
-// Sample data
-// const recentProjects = [
-//   { name: "Client A Project", emails: 45, progress: 75 },
-//   { name: "Marketing Campaign", emails: 32, progress: 60 },
-//   { name: "Product Launch", emails: 28, progress: 85 },
-//   { name: "Support Tickets", emails: 15, progress: 40 },
-// ];
+import {
+  BarChart,
+  Bar,
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  PieChart,
+  Pie,
+  Cell,
+  Legend,
+} from "recharts";
 
-const quickActions = [
-  { title: "New Project", icon: FolderKanban, color: "text-blue-500" },
-  { title: "Add to Project", icon: PlusCircle, color: "text-green-500" },
-  { title: "Star Important", icon: CheckCircle2, color: "text-yellow-500" },
-  { title: "Archive Old", icon: AlertCircle, color: "text-gray-500" },
+interface EmailVolumeData {
+  name: string;
+  value: number;
+}
+
+interface ResponseTimeData {
+  name: string;
+  average: number;
+}
+
+interface CategoryDistributionData {
+  name: string;
+  value: number;
+}
+
+// Sample data
+const COLORS: string[] = ["#3b82f6", "#22c55e", "#ef4444", "#f59e0b"];
+
+const emailVolumeData: EmailVolumeData[] = [
+  { name: "Mon", value: 45 },
+  { name: "Tue", value: 52 },
+  { name: "Wed", value: 38 },
+  { name: "Thu", value: 64 },
+  { name: "Fri", value: 47 },
+  { name: "Sat", value: 23 },
+  { name: "Sun", value: 19 },
+];
+
+const responseTimeData: ResponseTimeData[] = [
+  { name: "Mon", average: 2.4 },
+  { name: "Tue", average: 1.8 },
+  { name: "Wed", average: 3.2 },
+  { name: "Thu", average: 2.1 },
+  { name: "Fri", average: 2.7 },
+  { name: "Sat", average: 1.5 },
+  { name: "Sun", average: 2.9 },
+];
+
+const categoryDistributionData: CategoryDistributionData[] = [
+  { name: "Work", value: 45 },
+  { name: "Support", value: 30 },
+  { name: "Sales", value: 15 },
+  { name: "Personal", value: 10 },
 ];
 
 interface Email {
@@ -157,23 +211,102 @@ export default function DashboardPage() {
   }, []);
 
   return (
-    <PageLayout title="Dashboard">
+    <PageLayout
+      title="Dashboard"
+      actions={
+        <Select defaultValue="7d">
+          <SelectTrigger className="w-[180px]">
+            <SelectValue placeholder="Select timeframe" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="24h">Last 24 hours</SelectItem>
+            <SelectItem value="7d">Last 7 days</SelectItem>
+            <SelectItem value="30d">Last 30 days</SelectItem>
+            <SelectItem value="90d">Last 90 days</SelectItem>
+          </SelectContent>
+        </Select>
+      }
+    >
       <div className="space-y-6">
         {/* Main Content */}
         <div className="p-4 md:p-6 space-y-6">
           {/* Quick Actions Section */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            {quickActions.map((action) => (
-              <Card
-                key={action.title}
-                className="hover:bg-muted/50 transition-colors"
-              >
-                <CardContent className="p-4 flex items-center space-x-4">
-                  <action.icon className={cn("h-5 w-5", action.color)} />
-                  <span className="font-medium">{action.title}</span>
-                </CardContent>
-              </Card>
-            ))}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <Card>
+              <CardHeader>
+                <CardTitle>Email Volume</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <ResponsiveContainer width="100%" height={300}>
+                  <BarChart data={emailVolumeData}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="name" />
+                    <YAxis />
+                    <Tooltip />
+                    <Bar dataKey="value" fill="#3b82f6" />
+                  </BarChart>
+                </ResponsiveContainer>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Response Time</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <ResponsiveContainer width="100%" height={300}>
+                  <LineChart data={responseTimeData}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="name" />
+                    <YAxis />
+                    <Tooltip />
+                    <Line
+                      type="monotone"
+                      dataKey="average"
+                      stroke="#3b82f6"
+                      strokeWidth={2}
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Category Distribution</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <ResponsiveContainer width="100%" height={300}>
+                  <PieChart>
+                    <Pie
+                      data={categoryDistributionData}
+                      cx="50%"
+                      cy="50%"
+                      labelLine={false}
+                      label={({
+                        name,
+                        percent,
+                      }: {
+                        name: string;
+                        percent: number;
+                      }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                      outerRadius={100}
+                      fill="#8884d8"
+                      dataKey="value"
+                    >
+                      {categoryDistributionData.map((entry, index) => (
+                        <Cell
+                          key={`cell-${index}`}
+                          fill={COLORS[index % COLORS.length]}
+                        />
+                      ))}
+                    </Pie>
+                    <Tooltip />
+                    <Legend />
+                  </PieChart>
+                </ResponsiveContainer>
+              </CardContent>
+            </Card>
           </div>
 
           {/* Main Content Grid */}

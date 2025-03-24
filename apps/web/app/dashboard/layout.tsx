@@ -69,27 +69,9 @@ export default function DashboardLayout({
         }}
       >
         {/* @ts-ignore */}
-        <AppSidebar variant="inset" user={user} />
+        <AppSidebar variant="inset" user={user}  />
         <SidebarInset>{children}</SidebarInset>
       </SidebarProvider>
     </div>
-  );
-  return (
-    <SidebarProvider
-      style={{
-        // @ts-ignore
-        "--sidebar-width": "20rem",
-        // @ts-ignore
-        "--sidebar-width-mobile": "20rem",
-      }}
-    >
-      <div className="flex w-full min-h-screen">
-        {/* @ts-ignore */}
-        <AppSidebar user={user} />
-        <SidebarInset className="w-[calc(100vw-10rem)] overflow-hidden">
-          {children}
-        </SidebarInset>
-      </div>
-    </SidebarProvider>
   );
 }

@@ -1,6 +1,8 @@
 import {
   Sheet,
   SheetContent,
+  SheetDescription,
+  SheetFooter,
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
@@ -40,29 +42,14 @@ export function ProjectSettingsSheet({
           <SheetTitle className="text-xl font-semibold">
             {board.name}
           </SheetTitle>
-          <div className="flex items-center justify-between">
-            <Button
-              disabled={isSyncing}
-              onClick={onSync}
-              size="sm"
-              variant="outline"
-            >
-              <RefreshCcw className="w-4 h-4" />
-              <span className="ml-2">{isSyncing ? "Syncing..." : "Sync"}</span>
-            </Button>
-          </div>
+          <SheetDescription>
+            {board.description || "No description provided"}
+          </SheetDescription>
         </SheetHeader>
 
         <div className="mt-6 space-y-6">
           {/* Project Info Section */}
           <div className="space-y-4">
-            <div className="space-y-2">
-              <div className="text-sm text-muted-foreground">Description</div>
-              <p className="text-sm">
-                {board.description || "No description provided"}
-              </p>
-            </div>
-
             <div className="space-y-2">
               <div className="text-sm text-muted-foreground">Domains</div>
               <div className="flex flex-wrap gap-2">
@@ -86,6 +73,25 @@ export function ProjectSettingsSheet({
                     className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary/10 text-primary"
                   >
                     {label.name}
+                  </span>
+                ))}
+                {board.labels.length === 0 && (
+                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary/10 text-primary">
+                    No labels
+                  </span>
+                )}
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <div className="text-sm text-muted-foreground">Keywords</div>
+              <div className="flex flex-wrap gap-2">
+                {board?.keywords?.split(",").map((keyword: string) => (
+                  <span
+                    key={keyword}
+                    className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary/10 text-primary"
+                  >
+                    {keyword}
                   </span>
                 ))}
               </div>
@@ -148,6 +154,19 @@ export function ProjectSettingsSheet({
             </div>
           </div>
         </div>
+        <SheetFooter>
+          <div className="flex justify-between w-full py-4 mt-4 border-t border-neutral-200">
+            <Button
+              disabled={isSyncing}
+              onClick={onSync}
+              size="sm"
+              variant="outline"
+            >
+              <RefreshCcw className="w-4 h-4" />
+              <span className="ml-2">{isSyncing ? "Syncing..." : "Sync"}</span>
+            </Button>
+          </div>
+        </SheetFooter>
       </SheetContent>
     </Sheet>
   );

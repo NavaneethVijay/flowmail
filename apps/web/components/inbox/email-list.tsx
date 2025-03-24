@@ -182,7 +182,7 @@ export default function EmailList({ onEmailSelect }: EmailListProps) {
         </div>
       </div>
       <div className="flex-grow overflow-auto">
-        <ScrollArea className="h-[calc(100vh-10rem)] rounded-md">
+        <ScrollArea className="h-[calc(100vh-5rem)] md:h-[calc(100vh-9rem)] rounded-md">
           {loading ? (
             <p className="text-center p-4">Loading emails...</p>
           ) : emails.length === 0 ? (

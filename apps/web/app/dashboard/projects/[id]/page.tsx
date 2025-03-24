@@ -25,6 +25,7 @@ import { useSidebar } from "@/components/ui/sidebar";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { useParams } from "next/navigation";
+import { PageLayout } from "@/components/PageLayout";
 
 // Define types
 export interface Email {
@@ -77,11 +78,13 @@ export default function ProjectBoard() {
   } = useKanbanStore();
 
   const [selectedEmail, setSelectedEmail] = useState<Email | null>(null);
-  const [selectedKanbanEmail, setSelectedKanbanEmail] = useState<Email | null>(null);
+  const [selectedKanbanEmail, setSelectedKanbanEmail] = useState<Email | null>(
+    null
+  );
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { toast } = useToast();
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-  const { open: sidebarOpen } = useSidebar();
+  const { open: sidebarOpen, isMobile, openMobile } = useSidebar();
   const [uniqueEmails, setUniqueEmails] = useState<string[]>([]);
 
   function extractUniqueEmails(data: { from: string; to: string }[]): string[] {
@@ -112,7 +115,9 @@ export default function ProjectBoard() {
       const { board: boardInfo, board_columns } = boardData;
 
       // Sort board_columns by position
-      const sortedBoardColumns = [...board_columns].sort((a, b) => a.position - b.position);
+      const sortedBoardColumns = [...board_columns].sort(
+        (a, b) => a.position - b.position
+      );
 
       const data = await fetch(
         `/api/projects/${boardInfo.id}/email?forceRefresh=${forceRefresh}`
@@ -177,8 +182,8 @@ export default function ProjectBoard() {
 
   const fetchEmailThread = async (email: Email) => {
     try {
-      const emailData = await fetch(`/api/emails/${email.thread_id}`).then((res) =>
-        res.json()
+      const emailData = await fetch(`/api/emails/${email.thread_id}`).then(
+        (res) => res.json()
       );
       setSelectedEmail(emailData);
     } catch (error) {
@@ -187,7 +192,7 @@ export default function ProjectBoard() {
   };
 
   const handleItemClick = async (email: Email) => {
-    console.log('email from kaban', email);
+    console.log("email from kaban", email);
     setIsModalOpen(true);
     setSelectedKanbanEmail(email);
     await fetchEmailThread(email);
@@ -241,9 +246,7 @@ export default function ProjectBoard() {
         type: column.type,
         settings: column.settings,
       }));
-      console.log(
-        'columnsArray', columnsArray
-      );
+      console.log("columnsArray", columnsArray);
 
       throttledUpdateColumns(columnsArray as BoardColumn[]);
     },
@@ -255,49 +258,18 @@ export default function ProjectBoard() {
   }, []);
 
   return (
-    <div>
+    <PageLayout
+      title={board?.name}
+      actions={
+        <Button variant="outline" onClick={() => setIsSettingsOpen(true)}>
+          {/* @ts-ignore */}
+          <NotebookText className="w-4 h-4" />
+          <span className="ml-2">View Board</span>
+        </Button>
+      }
+    >
       <div className="flex flex-col">
-        <div className="flex justify-between items-center py-4 border-b border-neutral-200 w-[calc(100vw-20rem)]">
-          <div className="flex w-4/12 items-center gap-4 pl-4">
-            {isLoading || !board ? (
-              <Skeleton className="w-40 h-8 block" />
-            ) : (
-              <div className="flex items-center gap-4">
-                <Link href="/dashboard/projects">
-                  <Button variant="ghost" size="icon">
-                    {/* @ts-ignore */}
-                    <ArrowLeftIcon className="w-6 h-6 text-muted-foreground" />
-                    <span className="hidden">Back</span>
-                  </Button>
-                </Link>
-                <h1 className="text-2xl font-medium inline-flex items-center gap-2">
-                  {board?.name}
-                </h1>
-              </div>
-            )}
-          </div>
-          <div className="w-5/12">
-            <Input
-              className="w-full"
-              type="text"
-              placeholder="Search for emails"
-            />
-          </div>
-          <div className="w-3/12 pr-10 flex justify-end gap-2">
-            <Button variant="outline" onClick={() => setIsSettingsOpen(true)}>
-              {/* @ts-ignore */}
-              <NotebookText className="w-4 h-4" />
-              <span className="ml-2">View Board</span>
-            </Button>
-          </div>
-        </div>
-
-        <ScrollArea
-          className={cn(
-            "max-w-[100vw]",
-            sidebarOpen ? "w-[calc(100vw-20rem)]" : ""
-          )}
-        >
+        <ScrollArea>
           {isLoading || !board ? (
             <Skeleton className="w-1/4" />
           ) : (
@@ -313,15 +285,16 @@ export default function ProjectBoard() {
         </ScrollArea>
       </div>
 
-
-
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
         <DialogContent className="max-w-[80vw] w-[80vw] h-[90vh] px-0 pt-4 bg-neutral-100">
           <DialogHeader className="hidden">
             <DialogTitle>Email Details</DialogTitle>
             <DialogDescription>View email details here.</DialogDescription>
           </DialogHeader>
-          <EmailsDetails selectedEmail={selectedEmail} kanbanEmail={selectedKanbanEmail} />
+          <EmailsDetails
+            selectedEmail={selectedEmail}
+            kanbanEmail={selectedKanbanEmail}
+          />
         </DialogContent>
       </Dialog>
 
@@ -333,6 +306,6 @@ export default function ProjectBoard() {
         isSyncing={isSyncing}
         uniqueEmails={uniqueEmails}
       />
-    </div>
+    </PageLayout>
   );
 }

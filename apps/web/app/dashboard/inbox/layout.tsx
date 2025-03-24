@@ -19,7 +19,6 @@ export default function InboxLayout({ children }: { children: React.ReactNode })
     <PageLayout title="Inbox">
       <ResizablePanelGroup
         direction="horizontal"
-        className="min-h-100vh max-h-100vh"
       >
         {/* Hide email list on mobile when viewing an email */}
         <ResizablePanel
