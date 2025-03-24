@@ -15,6 +15,7 @@ import { formatEmailDate } from "@/lib/utils";
 import { AddToProjectDialog } from "@/components/inbox/add-to-project-dialog";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
+import { useRouter } from "next/navigation";
 
 interface Email {
   id: string;
@@ -44,6 +45,7 @@ interface EmailListProps {
 }
 
 export default function EmailList({ onEmailSelect }: EmailListProps) {
+  const router = useRouter();
   const [emails, setEmails] = useState<Email[]>([]);
   const [selectedEmails, setSelectedEmails] = useState<string[]>([]);
   const [nextPageToken, setNextPageToken] = useState<string | null>(null);
@@ -152,29 +154,12 @@ export default function EmailList({ onEmailSelect }: EmailListProps) {
 
   const handleEmailClick = (email: Email) => {
     setSelectedThreadId(email.threadId);
-    onEmailSelect(email.threadId);
+    router.push(`/dashboard/inbox/${email.threadId}`);
   };
 
   return (
     <div className="h-full flex flex-1 flex-col bg-background">
       <div className="p-2 border-b flex justify-between items-center bg-background">
-        <div className="flex items-center px-2">
-          <Checkbox
-            checked={selectedEmails.length === emails.length}
-            onCheckedChange={toggleAllEmails}
-            aria-label="Select all emails"
-            className="mr-2"
-          />
-          <Button
-            variant="outline"
-            size="sm"
-            className="text-foreground"
-            onClick={() => setIsAddToProjectOpen(true)}
-            disabled={selectedEmails.length === 0}
-          >
-            Add to Project
-          </Button>
-        </div>
         <div>
           <Button
             variant="ghost"
@@ -217,12 +202,6 @@ export default function EmailList({ onEmailSelect }: EmailListProps) {
                   )}
                   onClick={() => handleEmailClick(email)}
                 >
-                  <Checkbox
-                    checked={selectedEmails.includes(email.id)}
-                    onCheckedChange={() => toggleEmailSelection(email.id)}
-                    aria-label={`Select email from ${email.from}`}
-                    className="mr-4"
-                  />
                   <TooltipProvider>
                     <Tooltip>
                       <TooltipTrigger asChild>
