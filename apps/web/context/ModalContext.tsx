@@ -6,6 +6,7 @@ import React, {
   useState,
   ReactNode,
   ReactElement,
+  useEffect,
 } from "react";
 import {
   Dialog,
@@ -16,6 +17,18 @@ import {
   DialogDescription,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import {
+  Drawer,
+  DrawerTitle,
+  DrawerHeader,
+  DrawerDescription,
+  DrawerFooter,
+  DrawerClose,
+  DrawerContent,
+  DrawerTrigger,
+} from "@/components/ui/drawer";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 // Define the context types
 interface ModalContextType {
@@ -40,6 +53,19 @@ interface ModalContextType {
 
 // Create the context with a default value
 const ModalContext = createContext<ModalContextType | undefined>(undefined);
+const useMediaQuery = (query: string) => {
+  const [matches, setMatches] = useState(false);
+
+  useEffect(() => {
+    const media = window.matchMedia(query);
+    if (media.matches !== matches) {
+      setMatches(media.matches);
+    }
+    const listener = () => setMatches(media.matches);
+    window.addEventListener("resize", listener);
+    return () => window.removeEventListener("resize", listener);
+  }, [matches, query]);
+};
 
 export const ModalProvider: React.FC<{ children: ReactNode }> = ({
   children,
@@ -49,7 +75,7 @@ export const ModalProvider: React.FC<{ children: ReactNode }> = ({
   const [description, setDescription] = useState("");
   const [content, setContent] = useState<ReactNode>(null);
   const [actions, setActions] = useState<ReactNode>(null);
-
+  const isMobile = useIsMobile();
   const openModal = ({
     title,
     description,
@@ -86,8 +112,7 @@ export const ModalProvider: React.FC<{ children: ReactNode }> = ({
         closeModal,
       }}
     >
-      {children}
-      {isOpen && (
+      {!isMobile ? (
         <Dialog open={isOpen} onOpenChange={closeModal}>
           <DialogContent className="bg-white p-6 rounded-lg shadow-lg max-w-lg mx-auto z-50">
             <DialogHeader>
@@ -102,7 +127,25 @@ export const ModalProvider: React.FC<{ children: ReactNode }> = ({
             )}
           </DialogContent>
         </Dialog>
+      ) : (
+        <Drawer open={isOpen} onOpenChange={closeModal}>
+          <DrawerContent>
+            <DrawerHeader className="text-left">
+              <DrawerTitle>{title}</DrawerTitle>
+              <DrawerDescription>{description}</DrawerDescription>
+            </DrawerHeader>
+            <div className="p-4">{content}</div>
+            {actions && (
+              <DrawerFooter className="pt-2">
+                <DrawerClose asChild>
+                  <Button variant="outline">Cancel</Button>
+                </DrawerClose>
+              </DrawerFooter>
+            )}
+          </DrawerContent>
+        </Drawer>
       )}
+      {children}
     </ModalContext.Provider>
   );
 };

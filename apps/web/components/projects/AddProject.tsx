@@ -7,10 +7,20 @@ import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Separator } from "../ui/separator";
 import { Textarea } from "../ui/textarea";
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from "@/components/ui/command"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { Check, ChevronsUpDown } from "lucide-react"
-import { cn } from "@/lib/utils"
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+} from "@/components/ui/command";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Check, ChevronsUpDown } from "lucide-react";
+import { cn } from "@/lib/utils";
 import { useProjectsStore } from "@/store/use-projects-store";
 import { Label as LabelType } from "@/store/use-projects-store";
 
@@ -68,7 +78,7 @@ export function AddProject({
   const { labels: sourceLabels } = useProjectsStore();
   const [labelInput, setLabelInput] = useState("");
   const { toast } = useToast();
-  const [open, setOpen] = useState(false)
+  const [open, setOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [keywords, setKeywords] = useState<string[]>(
     initialData?.keywords ? initialData.keywords.split(",") : []
@@ -80,26 +90,34 @@ export function AddProject({
     label: string;
   }
 
-  const transformedLabels: TransformedLabel[] = sourceLabels.labels.map((label: LabelType) => ({
-    value: label.id,
-    label: label.name
-  }));
+  const transformedLabels: TransformedLabel[] = sourceLabels.labels.map(
+    (label: LabelType) => ({
+      value: label.id,
+      label: label.name,
+    })
+  );
 
   const filteredLabels = transformedLabels.filter((label) =>
     label.label.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const visibleLabels = searchTerm ? filteredLabels : transformedLabels.slice(0, 5);
+  const visibleLabels = searchTerm
+    ? filteredLabels
+    : transformedLabels.slice(0, 5);
 
-  const handleDomainAdd = (e: React.KeyboardEvent<HTMLInputElement> | React.FormEvent) => {
-    e.preventDefault();
+  const handleDomainAdd = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
 
-    const domain = domainInput.trim();
-    if (domain) {
-      const formattedDomain = domain.startsWith("@") ? domain.slice(1) : domain;
-      if (!domains.includes(formattedDomain)) {
-        setDomains([...domains, formattedDomain]);
-        setDomainInput("");
+      const domain = domainInput.trim();
+      if (domain) {
+        const formattedDomain = domain.startsWith("@")
+          ? domain.slice(1)
+          : domain;
+        if (!domains.includes(formattedDomain)) {
+          setDomains([...domains, formattedDomain]);
+          setDomainInput("");
+        }
       }
     }
   };
@@ -113,8 +131,8 @@ export function AddProject({
       e.preventDefault();
       const label = labelInput.trim();
       if (label && selectedLabels.length < 3) {
-        if (!selectedLabels.some(l => l.name === label)) {
-          setSelectedLabels([...selectedLabels, { id: '', name: label }]);
+        if (!selectedLabels.some((l) => l.name === label)) {
+          setSelectedLabels([...selectedLabels, { id: "", name: label }]);
           setLabelInput("");
         }
       }
@@ -122,17 +140,24 @@ export function AddProject({
   };
 
   const handleLabelRemove = (labelToRemove: string) => {
-    setSelectedLabels(selectedLabels.filter((label) => label.name !== labelToRemove));
+    setSelectedLabels(
+      selectedLabels.filter((label) => label.name !== labelToRemove)
+    );
   };
 
   const handleLabelSelect = (value: string) => {
-    const selectedLabel = sourceLabels.labels.find(label => label.id === value);
+    const selectedLabel = sourceLabels.labels.find(
+      (label) => label.id === value
+    );
     if (!selectedLabel) return;
 
-    if (selectedLabels.some(l => l.id === value)) {
-      setSelectedLabels(selectedLabels.filter(label => label.id !== value));
+    if (selectedLabels.some((l) => l.id === value)) {
+      setSelectedLabels(selectedLabels.filter((label) => label.id !== value));
     } else if (selectedLabels.length < 3) {
-      setSelectedLabels([...selectedLabels, { id: selectedLabel.id, name: selectedLabel.name }]);
+      setSelectedLabels([
+        ...selectedLabels,
+        { id: selectedLabel.id, name: selectedLabel.name },
+      ]);
     } else {
       toast({
         variant: "destructive",
@@ -186,16 +211,16 @@ export function AddProject({
       keywords: keywords.join(","),
     };
 
-    console.log('projectData to api', projectData);
-
+    console.log("projectData to api", projectData);
 
     if (isEditing && initialData?.id) {
       projectData.id = initialData.id;
     }
 
-    const endpoint = isEditing && initialData?.id
-      ? `/api/projects/${initialData.id}`
-      : "/api/projects";
+    const endpoint =
+      isEditing && initialData?.id
+        ? `/api/projects/${initialData.id}`
+        : "/api/projects";
 
     const response = await fetch(endpoint, {
       method: isEditing ? "PUT" : "POST",
@@ -206,7 +231,9 @@ export function AddProject({
       toast({
         variant: "destructive",
         title: "Error",
-        description: `Failed to ${isEditing ? "update" : "create"} project. Please try again.`,
+        description: `Failed to ${
+          isEditing ? "update" : "create"
+        } project. Please try again.`,
       });
       return;
     }
@@ -259,12 +286,7 @@ export function AddProject({
               id="domain_list"
               value={domainInput}
               onChange={(e) => setDomainInput(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  handleDomainAdd(e);
-                }
-              }}
-              onSubmit={handleDomainAdd}
+              onKeyDown={handleDomainAdd}
               placeholder="Press Enter to add domain"
               className="col-span-3"
             />
@@ -321,7 +343,9 @@ export function AddProject({
                         <Check
                           className={cn(
                             "mr-2 h-4 w-4",
-                            selectedLabels.some(l => l.id === label.value) ? "opacity-100" : "opacity-0"
+                            selectedLabels.some((l) => l.id === label.value)
+                              ? "opacity-100"
+                              : "opacity-0"
                           )}
                         />
                         {label.label}
