@@ -35,7 +35,7 @@ export default function EmailDetailPage() {
 
   return (
     <div className="flex flex-col h-full">
-      <div className="p-4 border-b flex items-center justify-between">
+      <div className="p-2 border-b flex items-center justify-between h-18">
         <Button
           variant="ghost"
           size="sm"
@@ -57,6 +57,13 @@ export default function EmailDetailPage() {
         </Button>
       </div>
 
+      <div className="p-4 border-b">
+        <h2 className="text-2xl font-medium ">{selectedEmail?.[0]?.subject}</h2>
+        <p className="text-sm text-muted-foreground">
+          {selectedEmail?.[0]?.snippet}
+        </p>
+      </div>
+
       {loading ? (
         <div className="flex flex-col items-center justify-center h-full space-y-3 animate-fadeIn">
           <div className="flex items-center space-x-2">
@@ -67,7 +74,9 @@ export default function EmailDetailPage() {
           </div>
         </div>
       ) : (
-        <EmailsDetails selectedEmail={selectedEmail} showSidebar={false} />
+        <div className="p-4">
+          <EmailsDetails selectedEmail={selectedEmail} isInbox={true} />
+        </div>
       )}
 
       <AddToProjectDialog

@@ -56,7 +56,7 @@ export function ChipsInput({
 
   return (
     <div className="w-full space-y-2">
-      <div className="flex flex-wrap gap-2 min-h-10 p-2 border rounded-md bg-background focus-within:outline-none ring-offset-0 focus-within:ring-0">
+      <div className="flex flex-wrap gap-2 min-h-10 p-2 border rounded-md bg-background">
         {value.map((chip) => (
           <div
             key={chip}
@@ -66,7 +66,7 @@ export function ChipsInput({
             <button
               type="button"
               onClick={() => removeChip(chip)}
-              className="flex items-center justify-center w-4 h-4 rounded-full hover:bg-primary/20 focus:outline-none"
+              className="flex items-center justify-center w-4 h-4 rounded-full hover:bg-primary/20"
               aria-label={`Remove ${chip}`}
             >
               <X className="w-3 h-3" />
@@ -80,7 +80,7 @@ export function ChipsInput({
             onChange={(e) => setInputValue(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder={placeholder}
-            className="border-0 shadow-none focus-visible:ring-0 ring-offset-0	 focus:outline-none h-8 px-0"
+            className="border-0 shadow-none h-8 px-0"
           />
         </div>
       </div>

@@ -10,12 +10,12 @@ import throttle from "lodash/throttle";
 import { useToast } from "@/hooks/use-toast";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogDescription,
-  DialogTitle,
-} from "@/components/ui/dialog";
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
 import EmailsDetails from "@/components/emails/emailsDetails";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -77,7 +77,7 @@ export default function ProjectBoard() {
     setSyncing,
   } = useKanbanStore();
 
-  const [selectedEmail, setSelectedEmail] = useState<Email | null>(null);
+  const [selectedEmail, setSelectedEmail] = useState<Email[] | null>(null);
   const [selectedKanbanEmail, setSelectedKanbanEmail] = useState<Email | null>(
     null
   );
@@ -257,6 +257,8 @@ export default function ProjectBoard() {
     fetchData();
   }, []);
 
+  console.log("selectedEmail", selectedEmail);
+
   return (
     <PageLayout
       title={board?.name}
@@ -285,18 +287,23 @@ export default function ProjectBoard() {
         </ScrollArea>
       </div>
 
-      <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-        <DialogContent className="max-w-[80vw] w-[80vw] h-[90vh] px-0 pt-4 bg-neutral-100">
-          <DialogHeader className="hidden">
-            <DialogTitle>Email Details</DialogTitle>
-            <DialogDescription>View email details here.</DialogDescription>
-          </DialogHeader>
-          <EmailsDetails
-            selectedEmail={selectedEmail}
-            kanbanEmail={selectedKanbanEmail}
-          />
-        </DialogContent>
-      </Dialog>
+      <Sheet open={isModalOpen} onOpenChange={setIsModalOpen}>
+        <SheetContent
+          side="right"
+          className="w-[90vw] sm:w-[40vw] sm:max-w-[40vw]"
+        >
+          <SheetHeader>
+            <SheetTitle>{selectedEmail?.[0]?.subject}</SheetTitle>
+            <SheetDescription>{selectedEmail?.[0]?.snippet}</SheetDescription>
+          </SheetHeader>
+          <div className="mt-4">
+            <EmailsDetails
+              selectedEmail={selectedEmail}
+              kanbanEmail={selectedKanbanEmail}
+            />
+          </div>
+        </SheetContent>
+      </Sheet>
 
       <ProjectSettingsSheet
         isOpen={isSettingsOpen}

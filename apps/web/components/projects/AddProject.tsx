@@ -24,6 +24,17 @@ import { cn } from "@/lib/utils";
 import { useProjectsStore } from "@/store/use-projects-store";
 import { Label as LabelType } from "@/store/use-projects-store";
 import { ChipsInput } from "@/components/ui/chips-input";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import * as z from "zod";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 
 interface LabelObject {
   id: string;
@@ -53,6 +64,14 @@ interface AddProjectProps {
   isEditing?: boolean;
 }
 
+const formSchema = z.object({
+  name: z.string().min(1, "Project name is required"),
+  description: z.string(),
+  domain_list: z.string(),
+  labels: z.array(z.object({ id: z.string(), name: z.string() })),
+  keywords: z.string(),
+});
+
 export function AddProject({
   onSuccess,
   initialDomains = [],
@@ -60,31 +79,30 @@ export function AddProject({
   initialData,
   isEditing,
 }: AddProjectProps) {
-  const [formData, setFormData] = useState<ProjectFormData>({
-    name: initialData?.name || "",
-    description: initialData?.description || "",
-    domain_list: initialData?.domain_list || "",
-    labels: initialData?.labels || [],
-    keywords: initialData?.keywords || "",
-  });
+  const { toast } = useToast();
   const [domains, setDomains] = useState<string[]>(
-    initialData?.domain_list
-      ? initialData.domain_list.split(",")
-      : initialDomains
+    initialData?.domain_list ? initialData.domain_list.split(",") : initialDomains
   );
-  const [domainInput, setDomainInput] = useState("");
   const [selectedLabels, setSelectedLabels] = useState<LabelObject[]>(
     initialData?.labels || []
   );
   const { labels: sourceLabels } = useProjectsStore();
-  const [labelInput, setLabelInput] = useState("");
-  const { toast } = useToast();
   const [open, setOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [keywords, setKeywords] = useState<string[]>(
     initialData?.keywords ? initialData.keywords.split(",") : []
   );
-  const [keywordInput, setKeywordInput] = useState("");
+
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      name: initialData?.name || "",
+      description: initialData?.description || "",
+      domain_list: initialData?.domain_list || "",
+      labels: initialData?.labels || [],
+      keywords: initialData?.keywords || "",
+    },
+  });
 
   interface TransformedLabel {
     value: string;
@@ -128,8 +146,8 @@ export function AddProject({
     }
   };
 
-  const handleSubmit = async () => {
-    if (!formData.name || !domains.length) {
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    if (!values.name || !domains.length) {
       toast({
         variant: "destructive",
         title: "Validation Error",
@@ -138,35 +156,19 @@ export function AddProject({
       return;
     }
 
-    interface ProjectSubmitData {
-      id?: string;
-      name: string;
-      description: string;
-      domain_list: string;
-      url_slug: string;
-      labels: LabelObject[];
-      keywords: string;
-    }
-
-    let projectData: ProjectSubmitData = {
-      name: formData.name,
-      description: formData.description,
+    const projectData = {
+      name: values.name,
+      description: values.description,
       domain_list: domains.join(","),
-      url_slug: formData.name.toLowerCase().replace(/\s+/g, "-"),
+      url_slug: values.name.toLowerCase().replace(/\s+/g, "-"),
       labels: selectedLabels,
       keywords: keywords.join(","),
+      ...(isEditing && initialData?.id ? { id: initialData.id } : {}),
     };
 
-    console.log("projectData to api", projectData);
-
-    if (isEditing && initialData?.id) {
-      projectData.id = initialData.id;
-    }
-
-    const endpoint =
-      isEditing && initialData?.id
-        ? `/api/projects/${initialData.id}`
-        : "/api/projects";
+    const endpoint = isEditing && initialData?.id
+      ? `/api/projects/${initialData.id}`
+      : "/api/projects";
 
     const response = await fetch(endpoint, {
       method: isEditing ? "PUT" : "POST",
@@ -177,9 +179,7 @@ export function AddProject({
       toast({
         variant: "destructive",
         title: "Error",
-        description: `Failed to ${
-          isEditing ? "update" : "create"
-        } project. Please try again.`,
+        description: `Failed to ${isEditing ? "update" : "create"} project. Please try again.`,
       });
       return;
     }
@@ -195,193 +195,146 @@ export function AddProject({
 
   return (
     <div className="w-full">
-      <div className="grid gap-4 py-4">
-        <div className="grid grid-cols-4 items-center gap-4">
-          <Label htmlFor="name" className="text-right text-foreground">
-            Name
-          </Label>
-          <Input
-            id="name"
-            value={formData.name}
-            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-            className="col-span-3"
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          <FormField
+            control={form.control}
+            name="name"
+            render={({ field }) => (
+              <FormItem className="grid grid-cols-4 items-center gap-4">
+                <FormLabel className="text-right">Name</FormLabel>
+                <FormControl className="col-span-3">
+                  <Input {...field} />
+                </FormControl>
+                <FormMessage className="col-start-2 col-span-3" />
+              </FormItem>
+            )}
           />
-        </div>
-        <div className="grid grid-cols-4 items-center gap-4">
-          <Label htmlFor="description" className="text-right text-foreground">
-            Description
-          </Label>
-          <Textarea
-            id="description"
-            value={formData.description}
-            onChange={(e) =>
-              setFormData({
-                ...formData,
-                description: e.target.value,
-              })
-            }
-            className="col-span-3"
+
+          <FormField
+            control={form.control}
+            name="description"
+            render={({ field }) => (
+              <FormItem className="grid grid-cols-4 items-center gap-4">
+                <FormLabel className="text-right">Description</FormLabel>
+                <FormControl className="col-span-3">
+                  <Textarea {...field} />
+                </FormControl>
+                <FormMessage className="col-start-2 col-span-3" />
+              </FormItem>
+            )}
           />
-        </div>
-        <div className="grid grid-cols-4 items-center gap-4">
-          <Label htmlFor="domain_list" className="text-right text-foreground">
-            Domains
-          </Label>
-          <div className="col-span-3 space-y-2">
-            <ChipsInput
-              value={domains}
-              onChange={setDomains}
-              placeholder="Press Enter to add domain"
-              prependSymbol="@"
-              validate={(value) => {
-                if (value.includes("@")) {
-                  toast({
-                    variant: "destructive",
-                    title: "Invalid domain",
-                    description: "Please enter domain without @ symbol",
-                  });
-                  return false;
-                }
-                return true;
-              }}
-            />
-          </div>
-          {/* <div className="col-span-3 space-y-2">
-            <Input
-              id="domain_list"
-              value={domainInput}
-              onChange={(e) => setDomainInput(e.target.value)}
-              onKeyDown={handleDomainAdd}
-              placeholder="Press Enter to add domain"
-              className="col-span-3"
-            />
-            <div className="flex flex-wrap gap-2">
-              {domains.map((domain) => (
-                <Badge
-                  key={domain}
-                  variant="secondary"
-                  className="flex items-center gap-1"
-                >
-                  @{domain}
-                  <X
-                    className="h-3 w-3 cursor-pointer"
-                    onClick={() => handleDomainRemove(domain)}
-                  />
-                </Badge>
-              ))}
-            </div>
-          </div> */}
-        </div>
-        <div className="grid grid-cols-4 items-center gap-4">
-          <Label htmlFor="labels" className="text-right text-foreground">
-            Labels
-          </Label>
-          <div className="col-span-3 space-y-2">
-            <Popover open={open} onOpenChange={setOpen}>
-              <PopoverTrigger asChild>
-                <Button
-                  variant="outline"
-                  role="combobox"
-                  aria-expanded={open}
-                  className="w-full justify-between"
-                >
-                  {selectedLabels.length > 0
-                    ? `${selectedLabels.length} selected`
-                    : "Select labels..."}
-                  <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-full p-0">
-                <Command>
-                  <CommandInput
-                    placeholder="Search labels..."
-                    value={searchTerm}
-                    onValueChange={setSearchTerm}
-                  />
-                  <CommandEmpty>No label found.</CommandEmpty>
-                  <CommandGroup>
-                    {visibleLabels.map((label) => (
-                      <CommandItem
-                        key={label.value}
-                        onSelect={() => handleLabelSelect(label.value)}
-                      >
-                        <Check
-                          className={cn(
-                            "mr-2 h-4 w-4",
-                            selectedLabels.some((l) => l.id === label.value)
-                              ? "opacity-100"
-                              : "opacity-0"
-                          )}
-                        />
-                        {label.label}
-                      </CommandItem>
-                    ))}
-                  </CommandGroup>
-                </Command>
-              </PopoverContent>
-            </Popover>
-            <div className="flex flex-wrap gap-2">
-              {selectedLabels.map((label) => (
-                <Badge
-                  key={label.id}
-                  variant="secondary"
-                  className="flex items-center gap-1"
-                >
-                  {label.name}
-                  <X
-                    className="h-3 w-3 cursor-pointer"
-                    onClick={() => handleLabelSelect(label.id)}
-                  />
-                </Badge>
-              ))}
+
+          <div className="grid grid-cols-4 items-center gap-4">
+            <Label className="text-right">Domains</Label>
+            <div className="col-span-3">
+              <ChipsInput
+                value={domains}
+                onChange={setDomains}
+                placeholder="Press Enter to add domain"
+                prependSymbol="@"
+                validate={(value) => {
+                  if (value.includes("@")) {
+                    toast({
+                      variant: "destructive",
+                      title: "Invalid domain",
+                      description: "Please enter domain without @ symbol",
+                    });
+                    return false;
+                  }
+                  return true;
+                }}
+              />
             </div>
           </div>
-        </div>
-        <div className="grid grid-cols-4 items-center gap-4">
-          <Label htmlFor="keywords" className="text-right text-foreground">
-            Keywords
-          </Label>
-          <div className="col-span-3 space-y-2">
-            <ChipsInput
-              value={keywords}
-              onChange={setKeywords}
-              placeholder="Press Enter to add keyword"
-            />
-            {/* <Input
-              id="keywords"
-              value={keywordInput}
-              onChange={(e) => setKeywordInput(e.target.value)}
-              onKeyDown={handleKeywordAdd}
-              placeholder="Press Enter to add keyword"
-              className="col-span-3"
-            />
-            <div className="flex flex-wrap gap-2">
-              {keywords.map((keyword) => (
-                <Badge
-                  key={keyword}
-                  variant="secondary"
-                  className="flex items-center gap-1"
-                >
-                  {keyword}
-                  <X
-                    className="h-3 w-3 cursor-pointer"
-                    onClick={() => handleKeywordRemove(keyword)}
-                  />
-                </Badge>
-              ))}
-            </div> */}
+
+          <div className="grid grid-cols-4 items-center gap-4">
+            <Label className="text-right">Labels</Label>
+            <div className="col-span-3">
+              <Popover open={open} onOpenChange={setOpen}>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    role="combobox"
+                    aria-expanded={open}
+                    className="w-full justify-between"
+                  >
+                    {selectedLabels.length > 0
+                      ? `${selectedLabels.length} selected`
+                      : "Select labels..."}
+                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-full p-0">
+                  <Command>
+                    <CommandInput
+                      placeholder="Search labels..."
+                      value={searchTerm}
+                      onValueChange={setSearchTerm}
+                    />
+                    <CommandEmpty>No label found.</CommandEmpty>
+                    <CommandGroup>
+                      {visibleLabels.map((label) => (
+                        <CommandItem
+                          key={label.value}
+                          onSelect={() => handleLabelSelect(label.value)}
+                        >
+                          <Check
+                            className={cn(
+                              "mr-2 h-4 w-4",
+                              selectedLabels.some((l) => l.id === label.value)
+                                ? "opacity-100"
+                                : "opacity-0"
+                            )}
+                          />
+                          {label.label}
+                        </CommandItem>
+                      ))}
+                    </CommandGroup>
+                  </Command>
+                </PopoverContent>
+              </Popover>
+              <div className="flex flex-wrap gap-2">
+                {selectedLabels.map((label) => (
+                  <Badge
+                    key={label.id}
+                    variant="secondary"
+                    className="flex items-center gap-1"
+                  >
+                    {label.name}
+                    <X
+                      className="h-3 w-3 cursor-pointer"
+                      onClick={() => handleLabelSelect(label.id)}
+                    />
+                  </Badge>
+                ))}
+              </div>
+            </div>
           </div>
-        </div>
-      </div>
-      <Separator />
-      <div className="flex mt-6 justify-end gap-2">
-        <Button type="button" variant="secondary" onClick={onClose}>
-          Close
-        </Button>
-        <Button type="submit" onClick={handleSubmit}>
-          {isEditing ? "Update Project" : "Save Project"}
-        </Button>
-      </div>
+
+          <div className="grid grid-cols-4 items-center gap-4">
+            <Label className="text-right">Keywords</Label>
+            <div className="col-span-3">
+              <ChipsInput
+                value={keywords}
+                onChange={setKeywords}
+                placeholder="Press Enter to add keyword"
+              />
+            </div>
+          </div>
+
+          <Separator />
+
+          <div className="flex justify-end gap-2 pt-4">
+            <Button type="button" variant="secondary" onClick={onClose}>
+              Close
+            </Button>
+            <Button type="submit">
+              {isEditing ? "Update Project" : "Save Project"}
+            </Button>
+          </div>
+        </form>
+      </Form>
     </div>
   );
 }

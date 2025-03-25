@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { ChevronDown, ChevronUp } from "lucide-react";
@@ -22,7 +22,23 @@ const formatDate = (dateString: string) => {
 
 export function Email({ email, isLast }: EmailProps) {
   const [isOpen, setIsOpen] = useState(isLast);
-  console.log('email in details', email);
+  const iframeRef = useRef<HTMLIFrameElement>(null);
+
+  // Function to adjust iframe height dynamically
+  const adjustIframeHeight = () => {
+    if (iframeRef.current && iframeRef.current.contentWindow) {
+      const newHeight =
+        iframeRef.current.contentWindow.document.body.scrollHeight + "px";
+      iframeRef.current.style.height = newHeight;
+    }
+  };
+
+  // Adjust height when iframe loads
+  useEffect(() => {
+    if (isOpen) {
+      setTimeout(adjustIframeHeight, 500); // Small delay to ensure content loads
+    }
+  }, [isOpen]);
 
   return (
     <div className="mb-4 border-b border-border">
@@ -53,10 +69,12 @@ export function Email({ email, isLast }: EmailProps) {
       {isOpen && (
         <div className="pr-4">
           <iframe
+            ref={iframeRef}
             srcDoc={email.body}
-            className="w-full min-h-[100vh] border-none overflow-hidden"
+            className="w-full border-none overflow-hidden"
             sandbox="allow-same-origin"
             title="Email content"
+            onLoad={adjustIframeHeight}
           />
         </div>
       )}

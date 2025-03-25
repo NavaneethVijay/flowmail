@@ -1,17 +1,19 @@
 "use client";
 
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardContent,
+  CardDescription,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ScrollArea } from "@/components/ui/scroll-area";
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { AddToProjectDialog } from "@/components/inbox/add-to-project-dialog";
 import { KeywordsGraph } from "@/components/dashboard/widgets/KeywordsGraph";
-import {
-  FolderKanban,
-  PlusCircle,
-  ArrowRight,
-} from "lucide-react";
+import { FolderKanban, PlusCircle, ArrowRight } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -32,6 +34,8 @@ import { PageLayout } from "@/components/PageLayout";
 
 import ResponseTimeChart from "@/components/dashboard/widgets/ResponseTime";
 import { CategoryChart } from "@/components/dashboard/widgets/CategoryChart";
+import { Skeleton } from "@/components/ui/skeleton";
+import { useAddProject } from "@/context/AddProjectContext";
 
 interface Email {
   id: string;
@@ -40,6 +44,20 @@ interface Email {
   from: string;
   date: string;
   snippet: string;
+}
+
+interface Project {
+  id: number;
+  name: string;
+  description: string;
+  url_slug: string;
+  email_count: number;
+}
+
+interface DomainStats {
+  domain: string;
+  count: number;
+  image: string;
 }
 
 function parseEmailString(emailStr: string) {
@@ -63,7 +81,9 @@ export default function DashboardPage() {
   const [selectedEmail, setSelectedEmail] = useState<Email | null>(null);
   const [isAddToProjectOpen, setIsAddToProjectOpen] = useState(false);
   const { toast } = useToast();
-  const { projects } = useProjectsStore();
+  const { projects, domainStats } = useProjectsStore();
+  const [loadingSuggestions, setLoadingSuggestions] = useState(true);
+  const { openAddProject } = useAddProject();
 
   // Get only the 4 most recent projects
   const recentProjects = projects.slice(0, 4).map((project) => ({
@@ -124,6 +144,10 @@ export default function DashboardPage() {
     fetchEmails();
   }, []);
 
+  useEffect(() => {
+    setLoadingSuggestions(false);
+  }, [domainStats]);
+
   return (
     <PageLayout
       title="Dashboard"
@@ -151,6 +175,87 @@ export default function DashboardPage() {
             <ResponseTimeChart />
             <CategoryChart />
           </div>
+
+          <Card className="mb-6">
+            <CardHeader>
+              <CardTitle>Suggested Projects</CardTitle>
+              <CardDescription>
+                Based on your email activity, create projects for these domains
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="relative overflow-hidden">
+              <ScrollArea className="max-w-full">
+                <div className="flex pb-4 space-x-4">
+                  {loadingSuggestions ? (
+                    <>
+                      {[1, 2, 3].map((index) => (
+                        <div key={index} className="flex-shrink-0 w-[300px]">
+                          <Card>
+                            <CardContent className="p-4">
+                              <Skeleton className="h-20 w-full" />
+                            </CardContent>
+                          </Card>
+                        </div>
+                      ))}
+                    </>
+                  ) : domainStats && domainStats.length > 0 ? (
+                    domainStats.slice(0, 5).map((domain) => (
+                      <div
+                        key={domain.domain}
+                        className="flex-shrink-0 w-3xs min-w-0"
+                      >
+                        <Card className="w-3xs">
+                          <CardContent className="p-4">
+                            <div className="space-y-3">
+                              <div className="flex items-center justify-between">
+                                <div className="flex items-center space-x-2">
+                                  <Avatar className="h-8 w-8">
+                                    <AvatarImage src={domain.image} />
+                                    <AvatarFallback>
+                                      {domain.domain.charAt(0).toUpperCase()}
+                                    </AvatarFallback>
+                                  </Avatar>
+                                  <h4 className="font-medium">
+                                    @{domain.domain}
+                                  </h4>
+                                </div>
+                                <Badge variant="secondary">
+                                  {domain.count} emails
+                                </Badge>
+                              </div>
+                              <div className="flex items-center justify-between">
+                                <p className="text-sm text-muted-foreground">
+                                  Create a project to manage emails
+                                </p>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() =>
+                                    openAddProject({
+                                      domain_list: domain.domain,
+                                    })
+                                  }
+                                  className="ml-2"
+                                >
+                                  <PlusCircle className="h-4 w-4 mr-2" />
+                                  Add Project
+                                </Button>
+                              </div>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="flex items-center justify-center w-full py-4 text-muted-foreground">
+                      No suggested domains available
+                    </div>
+                  )}
+                </div>
+                <ScrollBar orientation="horizontal" />
+              </ScrollArea>
+            </CardContent>
+          </Card>
 
           {/* Main Content Grid */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

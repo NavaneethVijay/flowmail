@@ -304,7 +304,7 @@ export function AppSidebar({
         </DropdownMenu>
 
         {/* Project Limit Section */}
-        <div className="space-y-2 rounded-lg p-3 border border-border bg-background">
+        <div className="space-y-2 rounded-lg p-3 border border-border bg-background hidden">
           <div className="flex justify-between text-sm">
             <span className="text-muted-foreground">Project Limit</span>
             <span className="font-medium">
