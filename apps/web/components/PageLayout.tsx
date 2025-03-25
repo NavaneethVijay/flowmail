@@ -12,8 +12,8 @@ export function PageLayout({
   return (
     <>
       <SiteHeader title={title} actions={actions} />
-      <div className="flex flex-1 flex-col">
-        <div className="@container/main flex flex-1 flex-col gap-2">
+      <div className="flex flex-1 flex-col overflow-y-auto">
+        <div className="@container/main flex flex-1 flex-col gap-2 min-h-0">
           <div className="flex flex-col gap-4 md:gap-6">
             {children}
           </div>
