@@ -276,7 +276,7 @@ function Kanban<T extends KanbanItem>({
                         <Card
                           ref={provided.innerRef}
                           {...provided.draggableProps}
-                          className="w-80 shrink-0 bg-gray-100 dark:bg-[#18181c] border-none"
+                          className="w-80 shrink-0 bg-gray-100 dark:bg-[#0e0e0e] border-none"
                         >
                           <CardContent className="p-4">
                             <div
@@ -362,7 +362,7 @@ function Kanban<T extends KanbanItem>({
                 {/* Add Column pseudo-column - Now outside of Draggable */}
                 <div className="w-80 shrink-0">
                   <Card
-                    className="bg-gray-100/50 dark:bg-[#18181c]/50 border-dashed cursor-pointer hover:border-gray-400 dark:hover:border-gray-600 transition-colors"
+                    className="bg-gray-100/50 dark:bg-[#0e0e0e]/50 border-dashed cursor-pointer hover:border-gray-400 dark:hover:border-gray-600 transition-colors"
                     onClick={addNewColumn}
                   >
                     <CardContent className="p-4 flex items-center justify-center h-[80px]">

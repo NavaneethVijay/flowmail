@@ -196,7 +196,48 @@ export default function ProjectBoard() {
     setIsModalOpen(true);
     setSelectedKanbanEmail(email);
     await fetchEmailThread(email);
+    window.history.pushState(null, '', `#email-${email.id}`);
   };
+
+  const handleSheetClose = () => {
+    setIsModalOpen(false);
+    window.history.pushState(null, '', window.location.pathname);
+  };
+
+  // Add function to fetch email by ID
+  const fetchEmailById = async (emailId: string) => {
+    const email = board?.emails?.find(e => e.id === emailId);
+    if (email) {
+      setSelectedKanbanEmail(email);
+      await fetchEmailThread(email);
+      setIsModalOpen(true);
+    }
+  };
+
+  // Update the useEffect that handles hash
+  useEffect(() => {
+    const handlePopState = () => {
+      if (!window.location.hash) {
+        setIsModalOpen(false);
+      }
+    };
+
+    const initializeFromHash = async () => {
+      const hash = window.location.hash;
+      if (hash.startsWith('#email-') && board?.emails) {
+        const emailId = hash.replace('#email-', '');
+        await fetchEmailById(emailId);
+      }
+    };
+
+    // Only check hash after board data is loaded
+    if (board) {
+      initializeFromHash();
+    }
+
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, [board]); // Add board as dependency
 
   const throttledUpdateColumns = useCallback(
     throttle(async (columns: BoardColumn[]) => {
@@ -266,7 +307,7 @@ export default function ProjectBoard() {
         <Button variant="outline" onClick={() => setIsSettingsOpen(true)}>
           {/* @ts-ignore */}
           <NotebookText className="w-4 h-4" />
-          <span className="ml-2">View Board</span>
+          <span className="hidden sm:block ml-2">View Board</span>
         </Button>
       }
     >
@@ -287,20 +328,28 @@ export default function ProjectBoard() {
         </ScrollArea>
       </div>
 
-      <Sheet open={isModalOpen} onOpenChange={setIsModalOpen}>
+      <Sheet open={isModalOpen && selectedEmail !== null} onOpenChange={handleSheetClose}>
         <SheetContent
           side="right"
-          className="w-[90vw] sm:w-[40vw] sm:max-w-[40vw]"
+          className="w-[100vw] sm:w-[40vw] sm:max-w-[40vw]"
         >
           <SheetHeader>
-            <SheetTitle>{selectedEmail?.[0]?.subject}</SheetTitle>
-            <SheetDescription>{selectedEmail?.[0]?.snippet}</SheetDescription>
+            {selectedEmail ? (
+              <>
+                <SheetTitle>{selectedEmail[0]?.subject}</SheetTitle>
+                <SheetDescription>{selectedEmail[0]?.snippet}</SheetDescription>
+              </>
+            ) : (
+              <Skeleton className="w-full h-12" />
+            )}
           </SheetHeader>
           <div className="mt-4">
-            <EmailsDetails
-              selectedEmail={selectedEmail}
-              kanbanEmail={selectedKanbanEmail}
-            />
+            {selectedEmail && (
+              <EmailsDetails
+                selectedEmail={selectedEmail}
+                kanbanEmail={selectedKanbanEmail}
+              />
+            )}
           </div>
         </SheetContent>
       </Sheet>

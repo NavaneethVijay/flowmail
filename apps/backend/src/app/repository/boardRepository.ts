@@ -11,7 +11,8 @@ export class BoardRepository {
       domain_list: board.domain_list,
       url_slug: board.url_slug,
       user_id: board.user_id,
-      labels: board.labels
+      labels: board.labels,
+      keywords: board.keywords
     }).select()
       .single()
     if (error) {

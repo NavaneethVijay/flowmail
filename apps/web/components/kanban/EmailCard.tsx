@@ -36,6 +36,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
+import { Progress } from "@/components/ui/progress";
 
 interface EmailProps {
   email: {
@@ -58,6 +59,11 @@ interface EmailProps {
     };
     rawLabels: string[]; // All Gmail labels including custom ones
   };
+}
+
+interface TodoProgress {
+  completed: number;
+  total: number;
 }
 
 function parseEmailString(emailStr: string) {
@@ -124,6 +130,10 @@ const getSystemLabelIcon = (label: string) => {
 
 export default function EmailCard({ email }: EmailProps) {
   const [isStarred, setIsStarred] = useState(email.labels?.starred || false);
+  const todoProgress: TodoProgress = {
+    completed: 1,
+    total: 8,
+  };
 
   const handleStar = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -264,10 +274,18 @@ export default function EmailCard({ email }: EmailProps) {
               })}
           </div>
 
-          <div className="mt-4">
+          <div className="w-full">
             <div className="flex items-center space-x-4 border p-2 rounded-md">
               <LucideListTodo className="text-muted-foreground h-4 w-4" />
-              <div className="text-sm text-muted-foreground">1/8</div>
+              <div className="flex-1">
+                <Progress
+                  value={(todoProgress.completed / todoProgress.total) * 100}
+                  className="h-2"
+                />
+              </div>
+              <div className="text-sm text-muted-foreground">
+                {todoProgress.completed}/{todoProgress.total}
+              </div>
             </div>
           </div>
         </CardFooter>

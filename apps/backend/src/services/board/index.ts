@@ -135,6 +135,7 @@ export default class BoardService {
                 .filter((part) => part) // Remove empty parts
                 .join(' '); // Concatenate with spaces
 
+            console.log("Search keywords", keywords)
 
             console.log('Search query for API', JSON.stringify(searchQuery, null, 2))
             console.log('Labels for API', JSON.stringify(labels, null, 2))

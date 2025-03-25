@@ -9,7 +9,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { ChevronLeft, ChevronRight, Plus } from "lucide-react";
+import { ChevronLeft, ChevronRight, Filter, Plus } from "lucide-react";
 import { ScrollArea } from "@radix-ui/react-scroll-area";
 import { formatEmailDate } from "@/lib/utils";
 import { AddToProjectDialog } from "@/components/inbox/add-to-project-dialog";
@@ -178,6 +178,11 @@ export default function EmailList({ onEmailSelect }: EmailListProps) {
             disabled={!nextPageToken}
           >
             <ChevronRight className="h-4 w-4" />
+          </Button>
+        </div>
+        <div>
+          <Button variant="ghost" size="icon" className="text-gray-600">
+            <Filter className="h-4 w-4" />
           </Button>
         </div>
       </div>

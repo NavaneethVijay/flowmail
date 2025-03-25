@@ -50,7 +50,7 @@ export class BoardEmailRepository {
         const userKey = encryptionHandler();
 
         await Promise.all(emails.map(async (email: any) => {
-            console.log('email to save in board', email)
+            console.log('email to save in board')
             const { id: email_id, threadId: thread_id, date } = email;
 
             // Encrypt all sensitive fields

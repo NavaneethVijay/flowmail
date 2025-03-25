@@ -176,87 +176,6 @@ export default function DashboardPage() {
             <CategoryChart />
           </div>
 
-          <Card className="mb-6">
-            <CardHeader>
-              <CardTitle>Suggested Projects</CardTitle>
-              <CardDescription>
-                Based on your email activity, create projects for these domains
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="relative overflow-hidden">
-              <ScrollArea className="max-w-full">
-                <div className="flex pb-4 space-x-4">
-                  {loadingSuggestions ? (
-                    <>
-                      {[1, 2, 3].map((index) => (
-                        <div key={index} className="flex-shrink-0 w-[300px]">
-                          <Card>
-                            <CardContent className="p-4">
-                              <Skeleton className="h-20 w-full" />
-                            </CardContent>
-                          </Card>
-                        </div>
-                      ))}
-                    </>
-                  ) : domainStats && domainStats.length > 0 ? (
-                    domainStats.slice(0, 5).map((domain) => (
-                      <div
-                        key={domain.domain}
-                        className="flex-shrink-0 w-3xs min-w-0"
-                      >
-                        <Card className="w-3xs">
-                          <CardContent className="p-4">
-                            <div className="space-y-3">
-                              <div className="flex items-center justify-between">
-                                <div className="flex items-center space-x-2">
-                                  <Avatar className="h-8 w-8">
-                                    <AvatarImage src={domain.image} />
-                                    <AvatarFallback>
-                                      {domain.domain.charAt(0).toUpperCase()}
-                                    </AvatarFallback>
-                                  </Avatar>
-                                  <h4 className="font-medium">
-                                    @{domain.domain}
-                                  </h4>
-                                </div>
-                                <Badge variant="secondary">
-                                  {domain.count} emails
-                                </Badge>
-                              </div>
-                              <div className="flex items-center justify-between">
-                                <p className="text-sm text-muted-foreground">
-                                  Create a project to manage emails
-                                </p>
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  onClick={() =>
-                                    openAddProject({
-                                      domain_list: domain.domain,
-                                    })
-                                  }
-                                  className="ml-2"
-                                >
-                                  <PlusCircle className="h-4 w-4 mr-2" />
-                                  Add Project
-                                </Button>
-                              </div>
-                            </div>
-                          </CardContent>
-                        </Card>
-                      </div>
-                    ))
-                  ) : (
-                    <div className="flex items-center justify-center w-full py-4 text-muted-foreground">
-                      No suggested domains available
-                    </div>
-                  )}
-                </div>
-                <ScrollBar orientation="horizontal" />
-              </ScrollArea>
-            </CardContent>
-          </Card>
-
           {/* Main Content Grid */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Recent Emails */}
@@ -387,6 +306,81 @@ export default function DashboardPage() {
               </CardContent>
             </Card>
           </div>
+
+          <Card className="mb-6">
+            <CardHeader>
+              <CardTitle>Suggested Projects</CardTitle>
+              <CardDescription>
+                Based on your email activity, create projects for these domains
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="relative">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 pb-4">
+                {loadingSuggestions ? (
+                  <>
+                    {[1, 2, 3, 4, 5].map((index) => (
+                      <div key={index} className="w-2xs">
+                        <Card>
+                          <CardContent className="p-4">
+                            <Skeleton className="h-20 w-full" />
+                          </CardContent>
+                        </Card>
+                      </div>
+                    ))}
+                  </>
+                ) : domainStats && domainStats.length > 0 ? (
+                  domainStats.map((domain) => (
+                    <div key={domain.domain} className="w-2xs">
+                      <Card className="w-full">
+                        <CardContent className="p-4">
+                          <div className="space-y-3">
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center space-x-2">
+                                <Avatar className="h-8 w-8">
+                                  <AvatarImage src={domain.image} />
+                                  <AvatarFallback>
+                                    {domain.domain.charAt(0).toUpperCase()}
+                                  </AvatarFallback>
+                                </Avatar>
+                                <h4 className="font-medium max-w-[100px] truncate">
+                                  @{domain.domain}
+                                </h4>
+                              </div>
+                              <Badge variant="secondary">
+                                {domain.count} emails
+                              </Badge>
+                            </div>
+                            <div className="flex flex-col items-start justify-between">
+                              <p className="text-sm text-muted-foreground">
+                                This seems like a good project to start due to the amount of emails you have received.
+                              </p>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() =>
+                                  openAddProject({
+                                    domain_list: domain.domain,
+                                  })
+                                }
+                                className="mt-2"
+                              >
+                                <PlusCircle className="h-4 w-4 mr-2" />
+                                Add Project
+                              </Button>
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    </div>
+                  ))
+                ) : (
+                  <div className="flex items-center justify-center w-full py-4 text-muted-foreground">
+                    No suggested domains available
+                  </div>
+                )}
+              </div>
+            </CardContent>
+          </Card>
         </div>
 
         <AddToProjectDialog
