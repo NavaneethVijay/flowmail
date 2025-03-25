@@ -64,5 +64,5 @@ export default function EmailDetail({ threadId }: EmailDetailProps) {
     );
   }
 
-  return <EmailsDetails selectedEmail={selectedEmail} showSidebar={false} />;
+  return <EmailsDetails selectedEmail={selectedEmail} isInbox={false} />;
 }
