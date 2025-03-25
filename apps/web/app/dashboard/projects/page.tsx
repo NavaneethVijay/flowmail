@@ -16,7 +16,6 @@ import {
   ChevronRight,
   Mail,
   Briefcase,
-  PlugZap,
   PlugZap2Icon,
   AlertCircle,
 } from "lucide-react";
@@ -29,9 +28,7 @@ import { toast } from "@/hooks/use-toast";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Avatar, AvatarImage, AvatarFallback } from "@radix-ui/react-avatar";
 import { ScrollArea } from "@radix-ui/react-scroll-area";
-import { useModal } from "@/context/ModalContext";
-import { AddProject } from "@/components/projects/AddProject";
-import Image from "next/image";
+
 import { useProjectsStore } from "@/store/use-projects-store";
 import {
   AlertDialog,
@@ -60,9 +57,8 @@ export default function ProjectsPage() {
   const router = useRouter();
   const { projects, domainStats, setProjects, removeProject } =
     useProjectsStore();
-  const [isLoading, setIsLoading] = useState(true);
-  const { openModal, closeModal } = useModal();
   const [searchTerm, setSearchTerm] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
   const [projectToDelete, setProjectToDelete] = useState<number | null>(null);
   useEffect(() => {
     fetchProjects();

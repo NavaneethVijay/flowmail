@@ -1,4 +1,3 @@
-//@ts-nocheck
 "use client";
 
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
@@ -6,18 +5,11 @@ import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
-import { Calendar } from "@/components/ui/calendar";
 import { AddToProjectDialog } from "@/components/inbox/add-to-project-dialog";
 import { KeywordsGraph } from "@/components/dashboard/widgets/KeywordsGraph";
 import {
   FolderKanban,
-  Clock,
-  CheckCircle2,
-  AlertCircle,
-  ChevronRight,
-  Calendar as CalendarIcon,
   PlusCircle,
-  Mail,
   ArrowRight,
 } from "lucide-react";
 import {
@@ -29,8 +21,6 @@ import {
 } from "@/components/ui/select";
 
 import { useRouter } from "next/navigation";
-import { format } from "date-fns";
-import { useModal } from "@/context/ModalContext";
 import { AddProject } from "@/components/projects/AddProject";
 import Link from "next/link";
 import { useEffect, useState } from "react";
@@ -38,70 +28,10 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { formatEmailDate } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import { useProjectsStore } from "@/store/use-projects-store";
-import { cn } from "@/lib/utils";
 import { PageLayout } from "@/components/PageLayout";
 
-import {
-  BarChart,
-  Bar,
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-  PieChart,
-  Pie,
-  Cell,
-  Legend,
-} from "recharts";
 import ResponseTimeChart from "@/components/dashboard/widgets/ResponseTime";
 import { CategoryChart } from "@/components/dashboard/widgets/CategoryChart";
-interface EmailVolumeData {
-  name: string;
-  value: number;
-}
-
-interface ResponseTimeData {
-  name: string;
-  average: number;
-}
-
-interface CategoryDistributionData {
-  name: string;
-  value: number;
-}
-
-// Sample data
-const COLORS: string[] = ["#3b82f6", "#22c55e", "#ef4444", "#f59e0b"];
-
-const emailVolumeData: EmailVolumeData[] = [
-  { name: "Mon", value: 45 },
-  { name: "Tue", value: 52 },
-  { name: "Wed", value: 38 },
-  { name: "Thu", value: 64 },
-  { name: "Fri", value: 47 },
-  { name: "Sat", value: 23 },
-  { name: "Sun", value: 19 },
-];
-
-const responseTimeData: ResponseTimeData[] = [
-  { name: "Mon", average: 2.4 },
-  { name: "Tue", average: 1.8 },
-  { name: "Wed", average: 3.2 },
-  { name: "Thu", average: 2.1 },
-  { name: "Fri", average: 2.7 },
-  { name: "Sat", average: 1.5 },
-  { name: "Sun", average: 2.9 },
-];
-
-const categoryDistributionData: CategoryDistributionData[] = [
-  { name: "Work", value: 45 },
-  { name: "Support", value: 30 },
-  { name: "Sales", value: 15 },
-  { name: "Personal", value: 10 },
-];
 
 interface Email {
   id: string;
@@ -128,7 +58,6 @@ function parseEmailString(emailStr: string) {
 
 export default function DashboardPage() {
   const router = useRouter();
-  const { openModal, closeModal } = useModal();
   const [recentEmails, setRecentEmails] = useState<Email[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedEmail, setSelectedEmail] = useState<Email | null>(null);
@@ -143,23 +72,6 @@ export default function DashboardPage() {
     slug: project.url_slug,
     progress: 75, // TODO: Calculate actual progress based on your requirements
   }));
-
-  const handleNewProject = () => {
-    openModal({
-      title: "Create a Project",
-      description: "Create a new project to manage your emails.",
-      content: (
-        <AddProject
-          onSuccess={() => {
-            closeModal();
-            router.refresh();
-          }}
-          onClose={closeModal}
-        />
-      ),
-      actions: null,
-    });
-  };
 
   const handleAddToProject = (email: Email) => {
     setSelectedEmail(email);

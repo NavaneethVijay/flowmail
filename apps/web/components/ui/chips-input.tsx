@@ -56,7 +56,7 @@ export function ChipsInput({
 
   return (
     <div className="w-full space-y-2">
-      <div className="flex flex-wrap gap-2 min-h-10 p-2 border rounded-md bg-background focus-within:outline-none focus-within:ring-0">
+      <div className="flex flex-wrap gap-2 min-h-10 p-2 border rounded-md bg-background focus-within:outline-none ring-offset-0 focus-within:ring-0">
         {value.map((chip) => (
           <div
             key={chip}

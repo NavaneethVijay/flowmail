@@ -3,8 +3,7 @@ import type { Metadata } from "next";
 import { Albert_Sans } from "next/font/google";
 import { ThemeProvider } from "next-themes";
 import { Toaster } from "@/components/ui/toaster";
-import { ModalProvider } from "@/context/ModalContext";
-import { Analytics } from "@vercel/analytics/react"
+import { Analytics } from "@vercel/analytics/react";
 import { AddProjectProvider } from "@/context/AddProjectContext";
 
 const inter = Albert_Sans({ subsets: ["latin"] });
@@ -52,19 +51,17 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={inter.className}>
-        <ModalProvider>
-          <ThemeProvider
-            attribute="class"
-            defaultTheme="dark"
-            enableSystem={false}
-            disableTransitionOnChange
-          >
-            <AddProjectProvider>
-              {children}
-            </AddProjectProvider>
-            <Toaster />
-          </ThemeProvider>
-        </ModalProvider>
+        {/* <ModalProvider> */}
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="dark"
+          enableSystem={false}
+          disableTransitionOnChange
+        >
+          <AddProjectProvider>{children}</AddProjectProvider>
+          <Toaster />
+        </ThemeProvider>
+        {/* </ModalProvider> */}
         <Analytics />
       </body>
     </html>
