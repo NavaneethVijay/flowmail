@@ -8,14 +8,12 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import {
-  Drawer,
-  DrawerContent,
-  DrawerHeader,
-  DrawerTitle,
-  DrawerDescription,
-  DrawerClose,
-} from "@/components/ui/drawer";
-import { Button } from "@/components/ui/button";
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetDescription,
+} from "@/components/ui/sheet";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { AddProject } from "@/components/projects/AddProject";
 
@@ -106,17 +104,21 @@ export const AddProjectProvider: React.FC<{ children: ReactNode }> = ({
           </DialogContent>
         </Dialog>
       ) : (
-        <Drawer open={isOpen} onOpenChange={closeAddProject}>
-          <DrawerContent>
-            <DrawerHeader className="text-left">
-              <DrawerTitle>Create a Project</DrawerTitle>
-              <DrawerDescription>
-                Create a new project to manage your emails.
-              </DrawerDescription>
-            </DrawerHeader>
+        <Sheet open={isOpen} onOpenChange={closeAddProject}>
+          <SheetContent side="bottom" className="h-[96%]">
+            <SheetHeader className="text-left">
+              <SheetTitle>
+                {initialData?.id ? "Edit Project" : "Create a Project"}
+              </SheetTitle>
+              <SheetDescription>
+                {initialData?.id
+                  ? "Edit your project details"
+                  : "Create a new project to manage your emails."}
+              </SheetDescription>
+            </SheetHeader>
             <div className="p-4">{content}</div>
-          </DrawerContent>
-        </Drawer>
+          </SheetContent>
+        </Sheet>
       )}
       {children}
     </AddProjectContext.Provider>
