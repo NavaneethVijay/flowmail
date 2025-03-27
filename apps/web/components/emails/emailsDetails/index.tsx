@@ -43,11 +43,13 @@ function parseInput(input: string) {
 function renderTextWithLinks(text: string) {
   const linkRegex = /<https?:\/\/[^\s<>]+>/g;
   return text.split(linkRegex).reduce((acc, part, index, array) => {
+    // @ts-ignore
     acc.push(<span key={`text-${index}`}>{part}</span>);
     if (index < array.length - 1) {
       const match = text.match(linkRegex);
       if (match && match[index]) {
         acc.push(
+          // @ts-ignore
           <a
             key={`link-${index}`}
             href={match[index].slice(1, -1)}
