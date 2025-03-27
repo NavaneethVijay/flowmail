@@ -3,15 +3,18 @@ import type { GoogleProvider } from '@/app/providers/GoogleProvider'
 import { ProviderFactory } from '@/app/providers/ProviderFactory'
 import type { EmailData } from '@/types/email'
 import { User } from '@supabase/supabase-js'
+import { GeminiService } from '../ai/GeminiService'
 
 export default class EmailService {
   private authService: AuthService
   private provider: GoogleProvider
   private user?: User
+  private geminiService: GeminiService
 
   constructor() {
     this.authService = new AuthService()
     this.provider = ProviderFactory.createProvider('google') as GoogleProvider
+    this.geminiService = new GeminiService(process.env.GEMINI_API_KEY!)
   }
 
   setUser(user: User) {
@@ -125,5 +128,38 @@ export default class EmailService {
 
     const tokens = await this.authService.refreshTokensIfNeeded()
     return this.provider.setTokens(tokens).getRecentInboxEmails(options)
+  }
+
+  async summarizeThread(threadId: string): Promise<{ summary: string, emails: EmailData[] }> {
+    if (!this.user) throw new Error('User not set');
+
+    try {
+      const tokens = await this.authService.refreshTokensIfNeeded();
+      this.provider.setTokens(tokens);
+
+      // Fetch emails in the thread
+      const emails = await this.provider.getEmail({ id: threadId, format: 'full' });
+
+      // Combine email content for summarization
+      const emailContent = emails
+        .map(email => `
+Date: ${email.date}
+From: ${email.from}
+Subject: ${email.subject}
+Content: ${email.body || email.snippet}
+        `)
+        .join('\n---\n');
+
+      // Get summary from Gemini
+      const summary = await this.geminiService.summarizeEmail(emailContent);
+
+      return {
+        summary,
+        emails: []
+      };
+    } catch (error) {
+      console.error('Error summarizing thread:', error);
+      throw error;
+    }
   }
 }

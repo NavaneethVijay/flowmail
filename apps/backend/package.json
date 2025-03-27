@@ -7,6 +7,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@google/genai": "^0.6.1",
     "@hono/node-server": "^1.13.7",
     "@supabase/supabase-js": "^2.39.3",
     "dotenv": "^16.4.5",
@@ -26,8 +27,8 @@
     "@types/node": "^20.17.8",
     "@types/nodemailer": "^6.4.16",
     "nodemon": "^3.1.7",
+    "tsc-alias": "^1.8.8",
     "tsx": "^4.19.2",
-    "typescript": "^5.7.2",
-    "tsc-alias": "^1.8.8"
+    "typescript": "^5.7.2"
   }
 }

@@ -42,7 +42,7 @@ export const metadata = {
       "Convert your emails into actionable tasks with an intuitive Kanban board.",
     images: [
       {
-        url: "/images/dashboard.webp",
+        url: "/images/dashboard.png",
         width: 1200,
         height: 630,
         alt: "Flowmail Platform Preview",
@@ -104,9 +104,9 @@ export default function Home() {
 
             {/* Dashboard Preview */}
             <div className="relative mx-auto max-w-6xl">
-              <div className="rounded-xl border bg-background/50 backdrop-blur-sm shadow-2xl">
+              <div className="rounded-xl">
                 <Image
-                  src="/images/dashboard.webp"
+                  src="/images/dashboard.png"
                   alt="Dashboard Preview"
                   width={1400}
                   height={1000}

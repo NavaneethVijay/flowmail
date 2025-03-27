@@ -1,7 +1,6 @@
 "use client"
 
 import { Pie, PieChart } from "recharts"
-
 import {
   Card,
   CardContent,
@@ -15,46 +14,47 @@ import {
   ChartLegend,
   ChartLegendContent,
 } from "@/components/ui/chart"
+
 const chartData = [
-  { browser: "chrome", visitors: 275, fill: "var(--color-chrome)" },
-  { browser: "safari", visitors: 200, fill: "var(--color-safari)" },
-  { browser: "firefox", visitors: 187, fill: "var(--color-firefox)" },
-  { browser: "edge", visitors: 173, fill: "var(--color-edge)" },
-  { browser: "other", visitors: 90, fill: "var(--color-other)" },
+  { category: "Primary", emails: 320, fill: "hsl(var(--chart-1))" },
+  { category: "Promotions", emails: 250, fill: "hsl(var(--chart-2))" },
+  { category: "Social", emails: 180, fill: "hsl(var(--chart-3))" },
+  { category: "Updates", emails: 140, fill: "hsl(var(--chart-4))" },
+  { category: "Forums", emails: 100, fill: "hsl(var(--chart-5))" },
 ]
 
 const chartConfig = {
-  visitors: {
-    label: "Visitors",
+  emails: {
+    label: "Emails",
   },
-  chrome: {
-    label: "Chrome",
-    color: "hsl(var(--chart-1))",
+  Primary: {
+    label: "Primary",
+    color: "hsl(var(--primary))",
   },
-  safari: {
-    label: "Safari",
-    color: "hsl(var(--chart-2))",
+  Promotions: {
+    label: "Promotions",
+    color: "hsl(var(--muted))",
   },
-  firefox: {
-    label: "Firefox",
-    color: "hsl(var(--chart-3))",
+  Social: {
+    label: "Social",
+    color: "hsl(var(--accent))",
   },
-  edge: {
-    label: "Edge",
-    color: "hsl(var(--chart-4))",
+  Updates: {
+    label: "Updates",
+    color: "hsl(var(--foreground))",
   },
-  other: {
-    label: "Other",
-    color: "hsl(var(--chart-5))",
+  Forums: {
+    label: "Forums",
+    color: "hsl(var(--destructive))",
   },
 } satisfies ChartConfig
 
 export function CategoryChart() {
   return (
     <Card className="flex flex-col">
-      <CardHeader className="items-center pb-0">
-        <CardTitle>Category Distribution</CardTitle>
-        <CardDescription>January - June 2024</CardDescription>
+      <CardHeader className="items-start pb-0">
+        <CardTitle>Email Category Distribution</CardTitle>
+        <CardDescription>Last 30 Days</CardDescription>
       </CardHeader>
       <CardContent className="flex-1 pb-0">
         <ChartContainer
@@ -62,9 +62,9 @@ export function CategoryChart() {
           className="mx-auto aspect-square max-h-[300px]"
         >
           <PieChart>
-            <Pie data={chartData} dataKey="visitors" />
+            <Pie data={chartData} dataKey="emails" nameKey="category" />
             <ChartLegend
-              content={<ChartLegendContent nameKey="browser" />}
+              content={<ChartLegendContent nameKey="category" />}
               className="-translate-y-2 flex-wrap gap-2 [&>*]:basis-1/4 [&>*]:justify-center"
             />
           </PieChart>

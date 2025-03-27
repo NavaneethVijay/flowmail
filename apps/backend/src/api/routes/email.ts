@@ -70,4 +70,20 @@ emailRouter.get('/:id', async (c: RequestContext) => {
   }
 })
 
+/**
+ * Summarize email thread
+ */
+emailRouter.get('/summarize/:threadId', async (c: RequestContext) => {
+  try {
+    const user = c.get('user') as User;
+    const threadId = c.req.param('threadId');
+
+    const result = await emailService.setUser(user).summarizeThread(threadId);
+    return c.json(result);
+  } catch (error) {
+    console.error('Failed to summarize thread:', error);
+    return c.json({ error: 'Failed to summarize email thread' }, 500);
+  }
+});
+
 export { emailRouter }

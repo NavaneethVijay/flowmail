@@ -67,7 +67,7 @@ export function Email({ email, isLast }: EmailProps) {
         </Button>
       </div>
       {isOpen && (
-        <div className="p-4">
+        <div className="p-0">
           <iframe
             ref={iframeRef}
             srcDoc={email.body}

@@ -59,7 +59,7 @@ export default function DashboardLayout({
   }, [router, toast]);
 
   return (
-    <div className="themes-wrapper bg-gray-100 dark:bg-gray-900">
+    <div className="themes-wrapper bg-[hsl(var(--sidebar-background))]">
       <SidebarProvider
         style={{
           // @ts-ignore

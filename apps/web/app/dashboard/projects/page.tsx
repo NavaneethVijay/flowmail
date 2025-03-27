@@ -51,7 +51,6 @@ import Link from "next/link";
 import { PageLayout } from "@/components/PageLayout";
 import { useAddProject } from "@/context/AddProjectContext";
 
-
 export default function ProjectsPage() {
   const { openAddProject } = useAddProject();
   const router = useRouter();
@@ -112,13 +111,15 @@ export default function ProjectsPage() {
   };
 
   const handleNewProject = (domain?: string) => {
-    const initialData = domain ? {
-      domain_list: domain,
-      name: '',
-      description: '',
-      labels: [],
-      keywords: '',
-    } : undefined;
+    const initialData = domain
+      ? {
+          domain_list: domain,
+          name: "",
+          description: "",
+          labels: [],
+          keywords: "",
+        }
+      : undefined;
 
     openAddProject(initialData);
   };
@@ -130,7 +131,7 @@ export default function ProjectsPage() {
       description: project.description,
       domain_list: project.domain_list,
       labels: project.labels || [],
-      keywords: project.keywords || '',
+      keywords: project.keywords || "",
     });
   };
 
@@ -250,11 +251,10 @@ export default function ProjectsPage() {
                             </div>
                             <Link
                               href={`/dashboard/projects/${project.url_slug}`}
-                              prefetch={true}
-                              className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground shadow hover:bg-primary/90 h-9 px-4 py-2"
+                              className="flex items-center gap-2 text-sm font-medium text-primary hover:text-primary/80 transition-all duration-300"
                             >
                               View Board
-                              <ChevronRight className="ml-2 h-4 w-4" />
+                              <ChevronRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
                             </Link>
                           </div>
                         </CardFooter>
@@ -290,7 +290,7 @@ export default function ProjectsPage() {
                             className="rounded-lg p-2 mb-4 overflow-hidden bg-primary/5 border border-neutral-200 dark:border-neutral-800 dark:bg-primary/10"
                             key={index}
                           >
-                            <div className="grid grid-cols-[40px_140px_120px] gap-4 items-center">
+                            <div className="grid grid-cols-[40px_200px_auto] gap-4 items-center">
                               <Avatar className="w-[40px] h-[40px] bg-white dark:bg-neutral-900 rounded-lg overflow-hidden border border-neutral-200 dark:border-neutral-800">
                                 <AvatarImage
                                   width={40}
@@ -306,11 +306,11 @@ export default function ProjectsPage() {
                                 </h3>
                               </div>
                               <Button
-                                variant="default"
-                                className="w-[120px] flex gap-1 items-center justify-between"
+                                variant="ringHover"
+                                size="icon"
                                 onClick={() => handleNewProject(domain.domain)}
                               >
-                                <PlugZap2Icon className="h-4 w-4" /> Connect
+                                <PlugZap2Icon className="h-4 w-4" />
                               </Button>
                             </div>
                           </div>
