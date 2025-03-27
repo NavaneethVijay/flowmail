@@ -3,14 +3,11 @@ import { NextResponse } from 'next/server';
 
 export async function GET(
   request: Request,
-  { params }: { params: { threadId: string } }
+  { params }: { params: Promise<{ threadId: string }> }
 ) {
   try {
-    const threadId = params.threadId;
+    const { threadId } = await params;
 
-    // Add your logic here to generate or fetch the summary
-    // For example:
-    // const summary = await yourSummaryLogic(threadId);
     const response = await apiClient.get(`/emails/summarize/${threadId}`);
 
     return NextResponse.json({
