@@ -43,6 +43,17 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
 
 const data = {
   navMain: [
@@ -126,7 +137,11 @@ export function AppSidebar({
                   <SidebarMenuItem key={item.title}>
                     <SidebarMenuButton
                       asChild
-                      isActive={pathname?.startsWith(item.url || "")}
+                      isActive={
+                        item.url === "/dashboard"
+                          ? pathname === "/dashboard"
+                          : pathname?.startsWith(item.url || "")
+                      }
                       className="flex items-center gap-3 px-3 py-2 text-sm rounded-lg hover:bg-primary/5 transition"
                     >
                       <Link href={item.url || ""}>
@@ -172,12 +187,25 @@ export function AppSidebar({
           </div>
         </div>
 
-        <button
-          onClick={handleSignOut}
-          className="flex items-center gap-2 w-full px-3 py-2 text-sm font-medium text-red-600 hover:bg-red-100 rounded-md"
-        >
-          <LogOut className="h-4 w-4" /> Logout
-        </button>
+        <AlertDialog>
+          <AlertDialogTrigger asChild>
+            <button className="flex items-center gap-2 w-full px-3 py-2 text-sm font-medium text-red-600 hover:bg-red-100 rounded-md">
+              <LogOut className="h-4 w-4" /> Logout
+            </button>
+          </AlertDialogTrigger>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Are you sure you want to logout?</AlertDialogTitle>
+              <AlertDialogDescription>
+                You will be signed out of your account and redirected to the home page.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction onClick={handleSignOut}>Logout</AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </SidebarFooter>
     </Sidebar>
   );

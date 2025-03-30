@@ -24,8 +24,15 @@ import { ProjectSettingsSheet } from "@/components/projects/project-details";
 import { useSidebar } from "@/components/ui/sidebar";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { PageLayout } from "@/components/PageLayout";
+import {
+  DialogHeader,
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
 
 // Define types
 export interface Email {
@@ -75,17 +82,17 @@ export default function ProjectBoard() {
     updateColumns,
     setLoading,
     setSyncing,
+    selectedKanbanEmail,
+    setSelectedKanbanEmail,
   } = useKanbanStore();
 
   const [selectedEmail, setSelectedEmail] = useState<Email[] | null>(null);
-  const [selectedKanbanEmail, setSelectedKanbanEmail] = useState<Email | null>(
-    null
-  );
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { toast } = useToast();
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const { open: sidebarOpen, isMobile, openMobile } = useSidebar();
   const [uniqueEmails, setUniqueEmails] = useState<string[]>([]);
+  const router = useRouter();
 
   function extractUniqueEmails(data: { from: string; to: string }[]): string[] {
     const emailSet = new Set<string>();
@@ -191,22 +198,26 @@ export default function ProjectBoard() {
     }
   };
 
-  const handleItemClick = async (email: Email) => {
-    console.log("email from kaban", email);
-    setIsModalOpen(true);
-    setSelectedKanbanEmail(email);
-    await fetchEmailThread(email);
-    window.history.pushState(null, '', `#email-${email.id}`);
+  const handleItemClick = (email: Email) => {
+    console.log("handleItemClick email", email);
+    useKanbanStore.getState().setSelectedKanbanEmail(email);
+    if (window.innerWidth < 768) {
+      router.push(`/dashboard/projects/${boardSlug}/email/${email.thread_id}`);
+    } else {
+      setSelectedEmail([email]);
+      setSelectedKanbanEmail(email);
+      setIsModalOpen(true);
+    }
   };
 
   const handleSheetClose = () => {
     setIsModalOpen(false);
-    window.history.pushState(null, '', window.location.pathname);
+    window.history.pushState(null, "", window.location.pathname);
   };
 
   // Add function to fetch email by ID
   const fetchEmailById = async (emailId: string) => {
-    const email = board?.emails?.find(e => e.id === emailId);
+    const email = board?.emails?.find((e) => e.id === emailId);
     if (email) {
       setSelectedKanbanEmail(email);
       await fetchEmailThread(email);
@@ -224,8 +235,8 @@ export default function ProjectBoard() {
 
     const initializeFromHash = async () => {
       const hash = window.location.hash;
-      if (hash.startsWith('#email-') && board?.emails) {
-        const emailId = hash.replace('#email-', '');
+      if (hash.startsWith("#email-") && board?.emails) {
+        const emailId = hash.replace("#email-", "");
         await fetchEmailById(emailId);
       }
     };
@@ -235,8 +246,8 @@ export default function ProjectBoard() {
       initializeFromHash();
     }
 
-    window.addEventListener('popstate', handlePopState);
-    return () => window.removeEventListener('popstate', handlePopState);
+    window.addEventListener("popstate", handlePopState);
+    return () => window.removeEventListener("popstate", handlePopState);
   }, [board]); // Add board as dependency
 
   const throttledUpdateColumns = useCallback(
@@ -328,21 +339,23 @@ export default function ProjectBoard() {
         </ScrollArea>
       </div>
 
-      <Sheet open={isModalOpen && selectedEmail !== null} onOpenChange={handleSheetClose}>
-        <SheetContent
-          side="right"
-          className="w-[100vw] sm:w-[40vw] sm:max-w-[40vw]"
-        >
-          <SheetHeader>
+      <Dialog
+        open={isModalOpen && selectedEmail !== null}
+        onOpenChange={handleSheetClose}
+      >
+        <DialogContent className="w-[100vw] sm:w-[90vw] sm:max-w-[90vw] m-10">
+          <DialogHeader>
             {selectedEmail ? (
               <>
-                <SheetTitle>{selectedEmail[0]?.subject}</SheetTitle>
-                <SheetDescription>{selectedEmail[0]?.snippet}</SheetDescription>
+                <DialogTitle>{selectedEmail[0]?.subject}</DialogTitle>
+                <DialogDescription>
+                  {selectedEmail[0]?.snippet}
+                </DialogDescription>
               </>
             ) : (
               <Skeleton className="w-full h-12" />
             )}
-          </SheetHeader>
+          </DialogHeader>
           <div className="mt-4">
             {selectedEmail && (
               <EmailsDetails
@@ -351,8 +364,8 @@ export default function ProjectBoard() {
               />
             )}
           </div>
-        </SheetContent>
-      </Sheet>
+        </DialogContent>
+      </Dialog>
 
       <ProjectSettingsSheet
         isOpen={isSettingsOpen}

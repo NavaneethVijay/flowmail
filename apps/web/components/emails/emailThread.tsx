@@ -9,9 +9,7 @@ interface EmailThreadProps {
 
 export default function EmailThread({ emails }: EmailThreadProps) {
   return (
-    <Card className="w-full  mx-auto border-none shadow-none">
-      <CardContent className="p-0 mt-2 ">
-
+    <div className="p-0 mt-2">
         {emails.map((email, index) => (
           <Email
             key={email.id}
@@ -19,7 +17,6 @@ export default function EmailThread({ emails }: EmailThreadProps) {
             isLast={index === emails.length - 1}
           />
         ))}
-      </CardContent>
-    </Card>
+      </div>
   );
 }

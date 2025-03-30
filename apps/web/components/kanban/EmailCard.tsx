@@ -18,25 +18,27 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import {
-  Archive,
   Flag,
-  MoreHorizontal,
-  Reply,
-  Star,
-  Trash,
   Inbox,
   Send,
   Rat,
   AlertCircle,
   Tag,
   LucideListTodo,
-  Eye,
-  SquareArrowOutDownRightIcon,
-  SquareArrowOutUpRightIcon,
+  MoreVertical,
+  CheckCircle,
+  ArrowRight,
+  ArrowLeft,
+  Trash2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import Link from "next/link";
 import { Progress } from "@/components/ui/progress";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 interface EmailProps {
   email: {
@@ -183,16 +185,31 @@ export default function EmailCard({ email }: EmailProps) {
               </div>
             </div>
             <div className="flex items-center space-x-2">
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-8 w-8"
-                onClick={handleStar}
-              >
-                <Link href={`/dashboard/projects/legendary/email/${email.thread_id}`}>
-                  <SquareArrowOutUpRightIcon className="h-4 w-4 text-muted-foreground" />
-                </Link>
-              </Button>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="icon" className="h-8 w-8">
+                    <MoreVertical className="h-4 w-4 text-muted-foreground" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem onClick={() => {}}>
+                    <CheckCircle className="h-4 w-4 mr-2" />
+                    Mark as Completed
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => {}}>
+                    <ArrowRight className="h-4 w-4 mr-2" />
+                    Move to Next Column
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => {}}>
+                    <ArrowLeft className="h-4 w-4 mr-2" />
+                    Move to Prev Column
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => {}}>
+                    <Trash2 className="h-4 w-4 mr-2 text-red-500" />
+                    Remove from Board
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
           </div>
         </CardHeader>

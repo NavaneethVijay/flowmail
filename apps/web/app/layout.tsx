@@ -10,6 +10,9 @@ const inter = Albert_Sans({ subsets: ["latin"] });
 
 export const metadata = {
   title: "Flowmail | Turbocharge Your Project Productivity",
+  icons: {
+    icon: "/favicon.ico",
+  },
   description:
     "Streamline your workflow with AI-powered project management and email capabilities. Join over 2,500 teams using our platform for enhanced productivity.",
   keywords: [

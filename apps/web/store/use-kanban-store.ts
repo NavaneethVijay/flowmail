@@ -47,6 +47,7 @@ interface KanbanBoard {
 
 interface KanbanState {
   board: KanbanBoard | null;
+  selectedKanbanEmail: Email | null;
   isLoading: boolean;
   isSyncing: boolean;
 
@@ -54,6 +55,7 @@ interface KanbanState {
   updateBoard: (data: Partial<KanbanBoard>) => void;
   updateColumns: (columns: Record<string, BoardColumn>) => void;
   setEmails: (emails: Email[], uniqueEmails: string[]) => void;
+  setSelectedKanbanEmail: (email: Email | null) => void;
   setLoading: (isLoading: boolean) => void;
   setSyncing: (isSyncing: boolean) => void;
   getBoard: () => KanbanBoard | null;
@@ -62,6 +64,7 @@ interface KanbanState {
 
 export const useKanbanStore = create<KanbanState>()((set, get) => ({
   board: null,
+  selectedKanbanEmail: null,
   isLoading: false,
   isSyncing: false,
 
@@ -92,6 +95,8 @@ export const useKanbanStore = create<KanbanState>()((set, get) => ({
     set((state) => ({
       board: state.board ? { ...state.board, emails, uniqueEmails } : null,
     })),
+
+  setSelectedKanbanEmail: (email) => set({ selectedKanbanEmail: email }),
 
   setLoading: (isLoading) => set({ isLoading }),
 

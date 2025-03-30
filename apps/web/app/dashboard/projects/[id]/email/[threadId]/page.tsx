@@ -2,11 +2,14 @@
 
 import EmailsDetails from "@/components/emails/emailsDetails";
 import { useParams } from "next/navigation";
-import React, { use, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
+import { useKanbanStore } from "@/store/use-kanban-store";
+import { PageLayout } from "@/components/PageLayout";
 
 export default function EmailViewPage() {
   const [selectedEmail, setSelectedEmail] = useState<any>(null);
   const { threadId } = useParams();
+  const kanbanEmail = useKanbanStore((state) => state.selectedKanbanEmail);
 
   useEffect(() => {
     if (!threadId) return;
@@ -27,5 +30,9 @@ export default function EmailViewPage() {
 
   if (!selectedEmail) return null;
 
-  return <EmailsDetails selectedEmail={selectedEmail} />;
+  return (
+    <PageLayout title="View Email">
+      <EmailsDetails selectedEmail={selectedEmail} kanbanEmail={kanbanEmail} isBoard />
+    </PageLayout>
+  );
 }

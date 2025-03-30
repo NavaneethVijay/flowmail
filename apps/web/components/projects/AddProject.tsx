@@ -89,6 +89,7 @@ export function AddProject({
   const { labels: sourceLabels } = useProjectsStore();
   const [open, setOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const [keywords, setKeywords] = useState<string[]>(
     initialData?.keywords ? initialData.keywords.split(",") : []
   );
@@ -156,6 +157,8 @@ export function AddProject({
       return;
     }
 
+    setIsLoading(true);
+
     const projectData = {
       name: values.name,
       description: values.description,
@@ -176,6 +179,7 @@ export function AddProject({
     });
 
     if (!response.ok) {
+      setIsLoading(false);
       toast({
         variant: "destructive",
         title: "Error",
@@ -184,6 +188,7 @@ export function AddProject({
       return;
     }
 
+    setIsLoading(false);
     toast({
       title: "Success",
       description: `Project ${isEditing ? "updated" : "created"} successfully!`,
@@ -329,7 +334,7 @@ export function AddProject({
             <Button type="button" variant="secondary" onClick={onClose}>
               Close
             </Button>
-            <Button type="submit">
+            <Button type="submit" isLoading={isLoading}>
               {isEditing ? "Update Project" : "Save Project"}
             </Button>
           </div>
