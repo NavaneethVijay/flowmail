@@ -97,6 +97,7 @@ export default function EmailsDetails({
   const [isDrawerOpen, setDrawerOpen] = useState(false);
 
   const fetchSummary = async (threadId: string) => {
+    console.log("fetching summary");
     setSummaryData({ isLoading: true });
     try {
       const response = await fetch(`/api/emails/summarize/${threadId}`, {
@@ -121,6 +122,12 @@ export default function EmailsDetails({
       });
     }
   };
+
+  useEffect(() => {
+    if (isDrawerOpen) {
+      fetchSummary(selectedEmail[0].threadId);
+    }
+  }, [isDrawerOpen]);
 
   if (!selectedEmail) {
     return (
@@ -163,33 +170,33 @@ export default function EmailsDetails({
           </DrawerTrigger>
           <DrawerContent>
             <ScrollArea className="overflow-y-auto h-full">
-           <DrawerHeader>
-              <DrawerTitle>Summary</DrawerTitle>
-            </DrawerHeader>
-            <div className="p-4">
-              <div className="mt-4">
+              <DrawerHeader>
+                <DrawerTitle>Summary</DrawerTitle>
+              </DrawerHeader>
+              <div className="p-4">
+                <div className="mt-4">
+                  {summaryData.isLoading ? (
+                    <Skeleton className="h-4 w-full" />
+                  ) : (
+                    summaryData.summary?.summary || "No summary available"
+                  )}
+                </div>
+                <h1 className="text-2xl font-bold mt-4">Action Items</h1>
                 {summaryData.isLoading ? (
                   <Skeleton className="h-4 w-full" />
+                ) : summaryData.summary?.actionItems?.length ? (
+                  <ul className="text-sm text-muted-foreground list-disc ml-4">
+                    {summaryData.summary?.actionItems?.map((item, index) => (
+                      <li key={index}>{item}</li>
+                    ))}
+                  </ul>
                 ) : (
-                  summaryData.summary?.summary || "No summary available"
+                  <p className="text-sm text-muted-foreground">
+                    No action items available
+                  </p>
                 )}
               </div>
-              <h1 className="text-2xl font-bold mt-4">Action Items</h1>
-              {summaryData.isLoading ? (
-                <Skeleton className="h-4 w-full" />
-              ) : summaryData.summary?.actionItems?.length ? (
-                <ul className="text-sm text-muted-foreground list-disc ml-4">
-                  {summaryData.summary?.actionItems?.map((item, index) => (
-                    <li key={index}>{item}</li>
-                  ))}
-                </ul>
-              ) : (
-                <p className="text-sm text-muted-foreground">
-                  No action items available
-                </p>
-              )}
-            </div>
-           </ScrollArea>
+            </ScrollArea>
           </DrawerContent>
         </Drawer>
       </div>
